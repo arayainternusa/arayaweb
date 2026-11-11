@@ -22,6 +22,7 @@ BASE = "https://arayainternusa.github.io/arayaweb/"
 PRODUCTION = "https://arayainternusa.co.id/araya/"
 ROBOTS = "noindex, nofollow"
 BUILD_TARGET = 'preview'
+GOOGLE_SITE_VERIFICATION = '70qqB0I6r7SYsg7viSNXPY0CvKvSHzHTRO7Wj3n6r-Y'
 ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg>'
 def asset_version(name):
     # Normalise line endings so Windows (CRLF) and Linux checkouts produce identical output.
@@ -77,6 +78,9 @@ def shell(title, description, content, route="", schema=()):
         image_preload = f'<link rel="preload" as="image" href="{prefix}assets/images/{hero_brand["image"]}" fetchpriority="high">'
     elif not route:
         image_preload = f'<link rel="preload" as="image" href="./assets/images/ship-1400.webp" imagesrcset="{srcset((("ship-800.webp", 800), ("ship-1400.webp", 1400)))}" imagesizes="100vw" fetchpriority="high">'
+    verification = ''
+    if BUILD_TARGET == 'production' and not route:
+        verification = f'\n  <meta name="google-site-verification" content="{GOOGLE_SITE_VERIFICATION}">'
     def nav(label, target):
         return f'<a href="{home}{target}">{label}</a>'
     return f'''<!doctype html>
@@ -86,7 +90,7 @@ def shell(title, description, content, route="", schema=()):
   <script>document.documentElement.classList.add('js')</script>
   <title>{escape(title)}</title>
   <meta name="description" content="{escape(description, quote=True)}">
-  <meta name="robots" content="{ROBOTS}">
+  <meta name="robots" content="{ROBOTS}">{verification}
   <meta name="theme-color" content="#1e2023">
   <link rel="canonical" href="{BASE}{route}">
   <meta property="og:site_name" content="PT Araya Internusa">
@@ -163,9 +167,9 @@ def home():
   <div class="client-marquee"><ul class="client-track" aria-label="Selected clients">{clients}</ul><ul class="client-track" aria-hidden="true">{clients}</ul></div>
 </div></section>
 <section class="section" id="brands"><div class="container">
-  <div class="section-heading"><div><p class="eyebrow">BRAND PARTNERS &amp; EQUIPMENT</p><h2>Specialist partners.<br>Multi-brand expertise.</h2></div><p>PT Araya Internusa is an authorised distributor for Noris and ComAp in Indonesia, with engineering experience across equipment from many other manufacturers.</p></div>
+  <div class="section-heading"><div><p class="eyebrow">BRAND PARTNERS &amp; EQUIPMENT</p><h2>Specialist partners.<br>Multi-brand expertise.</h2></div><p>PT Araya Internusa is an authorised distributor for both NORIS and ComAp in Indonesia. We supply equipment and provide engineering support for both brands.</p></div>
   <div class="brand-grid">
-    <article class="brand-panel"><div class="brand-name">NORIS<span>{escape(BRANDS["noris"]["legal_name"])}</span></div><h3>Instruments &amp; sensors.<br>Marine automation.</h3><p>{escape(BRANDS['noris']['home_summary'])}</p><a class="text-link" href="./noris/">Explore Noris in Indonesia {ARROW}</a></article>
+    <article class="brand-panel"><div class="brand-name">NORIS<span>{escape(BRANDS["noris"]["legal_name"])}</span></div><h3>Instruments &amp; sensors.<br>Marine automation.</h3><p>{escape(BRANDS['noris']['home_summary'])}</p><a class="text-link" href="./noris/">NORIS distributor in Indonesia {ARROW}</a></article>
     <article class="brand-panel"><div class="brand-name">ComAp<span>{escape(BRANDS["comap"]["legal_name"])}</span></div><h3>Engine control.<br>Power management.<br>Load sharing.</h3><p>{escape(BRANDS['comap']['home_summary'])}</p><a class="text-link" href="./comap/">Explore ComAp in Indonesia {ARROW}</a></article>
   </div>
   <div class="equipment-brands"><h3>We also work on equipment from</h3><div class="equipment-brand-grid">{groups}</div><p class="equipment-more">and many more...</p></div>

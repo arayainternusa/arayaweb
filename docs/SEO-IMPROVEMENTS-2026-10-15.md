@@ -57,5 +57,11 @@ Publication status is recorded in [Progress](PROGRESS.md). No fresh Core Web Vit
 1. Publishable appointment/certificate details: exact designation, issuer, scope and validity; general owner-approved wording is already implemented.
 2. Real project examples: vessel/site description, system, problem, Araya scope, outcome and permission-cleared photos. No case studies were invented from generic work photographs.
 3. Search Console, analytics and Business Profile access/verification after production launch; production sitemap submission and live indexing/redirect checks.
+
+## NORIS search visibility follow-up — 11 November 2026
+
+Google Indonesia omitted Araya from the first page and AI Overview for the distributor query. The production NORIS URL returned HTTP 200, allowed indexing, used a self-referencing canonical and appeared in the sitemap. A Google `site:` check returned no result for the NORIS URL. URL Inspection is needed to establish its indexing status.
+
+The NORIS title, description and main heading now identify the page as an authorised distributor page for Indonesia. The introduction names PT Araya Internusa and NORIS Group GmbH. The homepage states the authorised distributor relationship for both NORIS and ComAp and links directly to the NORIS page. The production homepage carries the HTML tag for Search Console URL-prefix verification. After deployment, use the verified property to submit `sitemap.xml` and inspect and request indexing for `/noris/`.
 4. Decisions for the 55 legacy pages without a confirmed equivalent, followed by reviewed live activation and permanent server redirects.
 5. Fresh mobile performance/field data on the actual production site. Indonesian translations remain an optional future content decision.
