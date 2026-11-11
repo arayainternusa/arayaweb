@@ -187,7 +187,7 @@ def home():
   <div class="client-marquee"><ul class="client-track" aria-label="Selected clients">{clients}</ul><ul class="client-track" aria-hidden="true">{clients}</ul></div>
 </div></section>
 <section class="section" id="brands"><div class="container">
-  <div class="section-heading"><div><p class="eyebrow">BRAND PARTNERS &amp; EQUIPMENT</p><h2>Specialist partners.<br>Multi-brand expertise.</h2></div><p>PT Araya Internusa is an authorised distributor for both NORIS and ComAp in Indonesia. We supply equipment and provide engineering support for both brands.</p></div>
+  <div class="section-heading"><div><p class="eyebrow">BRAND PARTNERS &amp; EQUIPMENT</p><h2>Specialist partners.<br>Multi-brand expertise.</h2></div><p>In Indonesia, PT Araya Internusa is the sole authorised distributor for NORIS and an authorised distributor for ComAp. We supply equipment and provide engineering support for both brands.</p></div>
   <div class="brand-grid">
     <article class="brand-panel"><div class="brand-name">NORIS<span>{escape(BRANDS["noris"]["legal_name"])}</span></div><h3>Instruments &amp; sensors.<br>Marine automation.</h3><p>{escape(BRANDS['noris']['home_summary'])}</p><a class="text-link" href="./noris/id/" lang="id">{indonesian_title('noris')} {ARROW}</a></article>
     <article class="brand-panel"><div class="brand-name">ComAp<span>{escape(BRANDS["comap"]["legal_name"])}</span></div><h3>Engine control.<br>Power management.<br>Load sharing.</h3><p>{escape(BRANDS['comap']['home_summary'])}</p><a class="text-link" href="./comap/id/" lang="id">{indonesian_title('comap')} {ARROW}</a></article>
@@ -236,7 +236,7 @@ def main():
     website = {"@type": "WebSite", "@id": BASE + "#website", "name": "PT Araya Internusa", "url": BASE, "publisher": {"@id": BASE + "#organization"}}
     service_schema = [{"@type": "Service", "name": service["name"] + " engineering services", "serviceType": service["name"], "url": BASE + "#" + key + "-services", "provider": {"@id": BASE + "#organization"}, "areaServed": {"@type": "Country", "name": "Indonesia"}, "description": service["description"]} for key, service in SERVICES.items()]
     write("", shell("Marine & Industrial Automation Indonesia | Araya Internusa",
-                    "Ship maintenance, repair and retrofit across Indonesia. Offices in Surabaya and Jakarta. Marine engineering and authorised Noris and ComAp distributor.",
+                    "Ship maintenance, repair and retrofit across Indonesia. Surabaya and Jakarta offices. Sole authorised NORIS distributor and authorised ComAp distributor.",
                     home(), schema=[website, *service_schema]))
     for key, service in SERVICES.items():
         write(key, legacy_service_page(key, service))

@@ -49,7 +49,7 @@ Marine and industrial sections describe project scopes provided by the owner and
 
 Dedicated Noris and ComAp guides include manufacturer background, grouped product information, an informational equipment brief and expandable FAQs. Only the final shared contact section has enquiry CTA buttons. Noris covers eight product areas; ComAp covers six. These are Araya's brand guides for Indonesia; manufacturer links lead to current product details and documents.
 
-The owner selected authorised distributor wording for Noris and ComAp in Indonesia. Exclusivity, specific product availability and warranties are not asserted. General certification wording is owner-approved; specific certification names, issuers and scope have not been provided.
+The owner confirmed that Araya holds the appointment letter as the sole authorised distributor for NORIS in Indonesia. ComAp uses the authorised distributor designation. General certification wording is owner-approved.
 
 Manufacturer application sources checked 2026-10-08:
 

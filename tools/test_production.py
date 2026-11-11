@@ -49,10 +49,12 @@ class ProductionTests(unittest.TestCase):
 
     def test_indonesian_brand_pages_have_reciprocal_language_links(self):
         home = (PRODUCTION / 'index.html').read_text(encoding='utf-8')
-        for key, name in [('noris', 'NORIS'), ('comap', 'ComAp')]:
+        for key, title in [
+            ('noris', 'Distributor Resmi Tunggal NORIS di Indonesia'),
+            ('comap', 'Distributor Resmi ComAp di Indonesia'),
+        ]:
             english = (PRODUCTION / key / 'index.html').read_text(encoding='utf-8')
             indonesian = (PRODUCTION / key / 'id/index.html').read_text(encoding='utf-8')
-            title = f'Distributor Resmi {name} di Indonesia'
             self.assertIn('<html lang="id">', indonesian)
             self.assertIn(f'<title>{title} | Araya Internusa</title>', indonesian)
             self.assertIn(f'<h1>{title}</h1>', indonesian)

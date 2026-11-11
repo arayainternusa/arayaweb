@@ -6,7 +6,7 @@ from brand_profiles import BRANDS
 
 GUIDES = {
     'noris': {
-        'description': 'PT Araya Internusa adalah distributor resmi NORIS di Indonesia. Tanyakan sensor putaran, suhu, tekanan, instrumen, noriMos, noriStar, dan noriNet.',
+        'description': 'PT Araya Internusa adalah distributor resmi tunggal NORIS di Indonesia. Tanyakan sensor, instrumen, noriMos, noriStar, dan noriNet.',
         'hero_alt': 'Panel anjungan noriStar NORIS dengan dua layar dan dua tuas kontrol propulsi',
         'hero_caption': 'Panel anjungan noriStar · Foto produk Noris Group GmbH',
         'groups': (
@@ -48,8 +48,9 @@ GUIDES = {
 
 
 def indonesian_title(key):
-    name = 'NORIS' if key == 'noris' else BRANDS[key]['name']
-    return f'Distributor Resmi {name} di Indonesia'
+    if key == 'noris':
+        return 'Distributor Resmi Tunggal NORIS di Indonesia'
+    return f'Distributor Resmi {BRANDS[key]["name"]} di Indonesia'
 
 
 def system_figure(diagram, caption, alt, prefix, brand):

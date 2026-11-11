@@ -1,5 +1,7 @@
 # Araya website conventions
 
+- Owner direction, 11 November 2026. Araya holds the appointment letter as the **sole authorised distributor for NORIS in Indonesia**. The Bahasa Indonesia designation is **distributor resmi tunggal NORIS di Indonesia**. ComAp uses **authorised distributor**.
+
 - Latest owner correction, 15 October: all 32 service-scope descriptions must be short and generic: one brief sentence describing the service, roughly 10–15 words. Remove extended assessment/process explanations and detailed model examples. This supersedes the earlier SEO expansion of these paragraphs; retain headings, anchors, actual service coverage and useful equipment terms.
 
 - Owner direction, 15 October: client logos slide continuously left on mobile as on desktop. Keep both identical tracks, hide the duplicated track from assistive technology, contain overflow inside the strip and retain the static grid only for reduced-motion preference. Mobile spacing is 48px with a 30-second loop; desktop remains unchanged.
