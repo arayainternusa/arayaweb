@@ -62,7 +62,7 @@ class ExperienceTests(unittest.TestCase):
                 self.assertNotIn(f'href="./{service}/"', (PUBLIC / page).read_text(encoding='utf-8'))
                 self.assertNotIn(f'href="../{service}/"', (PUBLIC / page).read_text(encoding='utf-8'))
         sitemap = (PUBLIC / 'sitemap.xml').read_text(encoding='utf-8')
-        self.assertEqual(sitemap.count('<url>'), 4)  # Three marketing pages plus the privacy notice.
+        self.assertEqual(sitemap.count('<url>'), 6)  # Five marketing pages plus the privacy notice.
 
     def test_service_sectors_contain_scopes_without_repeated_promotions(self):
         import re

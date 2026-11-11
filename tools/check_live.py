@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
+from check import CONTENT_ROUTES
 
 BASE = 'https://arayainternusa.co.id'
 class NoRedirect(HTTPRedirectHandler):
@@ -34,7 +35,8 @@ def check(manifest_path):
     sha = manifest['source_commit']
     with ThreadPoolExecutor(max_workers=6) as pool:
         list(pool.map(lambda item: verify_file(item, sha), manifest['files'].items()))
-    for route, name in [('/', 'index.html'), ('/noris/', 'noris/index.html'), ('/comap/', 'comap/index.html'), ('/privacy/', 'privacy/index.html')]:
+    for name in sorted(CONTENT_ROUTES):
+        route = '/' + name.removesuffix('index.html')
         code, headers, body = fetch(f'{BASE}{route}?araya_release={sha}')
         if code != 200 or hashlib.sha256(body).hexdigest() != manifest['files'][name] or b'content="index, follow"' not in body:
             raise ValueError(f'Live content/indexing mismatch: {route}')
@@ -42,14 +44,15 @@ def check(manifest_path):
         '/araya/services/':'/#services','/araya/services/marine/':'/#marine-services',
         '/araya/services/industrial/':'/#industrial-services', '/araya/services/automation/':'/#automation-services',
         '/araya/team/':'/#leadership','/araya/contact/':'/#contact','/araya/contact-2/':'/#contact',
-        '/index.php':'/','/noris':'/noris/','/comap':'/comap/','/privacy':'/privacy/'}
+        '/index.php':'/','/noris':'/noris/','/comap':'/comap/','/privacy':'/privacy/',
+        '/noris/id':'/noris/id/','/comap/id':'/comap/id/'}
     for source, target in redirects.items():
         code, headers, _ = fetch(BASE+source)
         location = headers.get('Location', '')
         if code != 301 or location not in {target, BASE+target}:
             raise ValueError(f'Legacy/canonical redirect mismatch: {source} ({code}, {location})')
     for route, statuses in [('/araya/wp-admin/', {410}),('/araya/wp-content/uploads/company-profile.pdf',{410}),
-            ('/araya/project1/',{410}),('/araya.zip',{404}),('/araya-release-missing-test',{404}),
+            ('/araya/project1/',{410}),('/araya/project2/',{410}),('/araya.zip',{404}),('/araya-release-missing-test',{404}),
             ('/.araya-current/index.html',{403,404}),('/%2earaya-current/index.html',{403,404}),
             (f'/.araya-releases/{sha}-1-1/index.html',{403,404}),('/.git/config',{403,404}),('/wp-config.php',{403,404})]:
         code, _, _ = fetch(BASE+route)
@@ -59,7 +62,7 @@ def check(manifest_path):
         code, headers, _ = fetch(source)
         if code != 301 or headers.get('Location') != BASE+'/':
             raise ValueError(f'HTTPS/hostname redirect mismatch: {source}')
-    print(f'PASS live HTTPS: {len(manifest["files"])} exact file hashes, four indexable pages, redirects, retired downloads and protected paths.')
+    print(f'PASS live HTTPS: {len(manifest["files"])} exact file hashes, {len(CONTENT_ROUTES)} indexable pages, redirects, retired downloads and protected paths.')
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('manifest');parser.add_argument('--attempts',type=int,default=1);args=parser.parse_args()

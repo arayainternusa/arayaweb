@@ -374,3 +374,11 @@ details[open]>summary .disclosure-chevron{transform:rotate(180deg)}
 
 /* Mobile keeps a single clean sticky navigation row; contact links remain in the footer. */
 @media(max-width:680px){.site-header .utility{display:none}.site-header{top:0}}
+
+.brand-language{background:#1e2023;color:#fff;border-top:1px solid #ffffff26}
+.brand-language nav{display:flex;justify-content:flex-end;gap:8px;padding-block:6px;font-size:14px}
+.brand-language a,.brand-language span{display:inline-flex;align-items:center;min-height:44px;padding:0 10px}
+.brand-language a{text-decoration:underline;text-underline-offset:4px}
+.brand-language a:hover,.brand-language [aria-current]{color:#ff862e}
+
+.hero-product-cover img{object-fit:cover;padding:0}

@@ -73,7 +73,9 @@
     if (!banner) return;
     banner.hidden = false;
     banner.dataset.choice = accepted ? 'accepted' : 'not-accepted';
-    if (status) status.textContent = accepted ? 'Analytics is currently accepted.' : 'Optional analytics is currently off.';
+    if (status) status.textContent = accepted
+      ? (status.dataset?.accepted || 'Analytics is currently accepted.')
+      : (status.dataset?.disabled || 'Optional analytics is currently off.');
   }
   function choose(value) {
     accepted = value;

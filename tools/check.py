@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
-CONTENT_ROUTES = {'index.html', 'noris/index.html', 'comap/index.html', 'privacy/index.html'}
+CONTENT_ROUTES = {'index.html', 'noris/index.html', 'comap/index.html', 'noris/id/index.html', 'comap/id/index.html', 'privacy/index.html'}
 ALL_ROUTES = CONTENT_ROUTES | {f'{key}/index.html' for key in ('marine', 'industrial', 'automation')}
 ASSET_SUFFIXES = {'.css', '.js', '.woff2', '.webp', '.jpg', '.jpeg', '.png', '.svg', '.pdf'}
 
@@ -67,7 +67,7 @@ def main():
     pages = {path.resolve(): Page(path) for path in PUBLIC.rglob("*.html")}
     errors = []
     if {p.relative_to(PUBLIC.resolve()).as_posix() for p in pages} != ALL_ROUTES:
-        errors.append('Expected four content pages including privacy and three compatibility routes')
+        errors.append('Expected all content pages and three compatibility routes')
     for path, page in pages.items():
         route = path.relative_to(PUBLIC.resolve()).as_posix()
         expected_robots = ('index, follow' if route in CONTENT_ROUTES else 'noindex, follow') if production else 'noindex, nofollow'
@@ -109,7 +109,7 @@ def main():
     try:
         sitemap = ET.parse(PUBLIC / 'sitemap.xml')
         locations = {node.text for node in sitemap.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')}
-        if locations != {base, base + 'noris/', base + 'comap/', base + 'privacy/'}:
+        if locations != {base + path.removesuffix('index.html') for path in CONTENT_ROUTES}:
             errors.append('Sitemap does not match the target content URLs')
         expected_robots = f'User-agent: *\nAllow: /\nSitemap: {base}sitemap.xml\n' if production else 'User-agent: *\nAllow: /\n'
         if (PUBLIC / 'robots.txt').read_text(encoding='utf-8') != expected_robots:

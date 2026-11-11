@@ -13,7 +13,7 @@ class LiveCheckTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory(prefix='araya-live-check-')
         self.addCleanup(self.temp.cleanup)
         self.path=Path(self.temp.name)/'release.json'
-        self.files={n:b'<meta name="robots" content="index, follow">' for n in ('index.html','noris/index.html','comap/index.html','privacy/index.html')}
+        self.files={n:b'<meta name="robots" content="index, follow">' for n in ('index.html','noris/index.html','comap/index.html','noris/id/index.html','comap/id/index.html','privacy/index.html')}
         self.files['assets/site.js']=b'// checked JS'
         self.path.write_text(json.dumps({'source_commit':'a'*40,'files':{n:hashlib.sha256(v).hexdigest() for n,v in self.files.items()}}))
     def response(self,url):
@@ -24,7 +24,8 @@ class LiveCheckTests(unittest.TestCase):
             '/araya/services/':'/#services','/araya/services/marine/':'/#marine-services',
             '/araya/services/industrial/':'/#industrial-services','/araya/services/automation/':'/#automation-services',
             '/araya/team/':'/#leadership','/araya/contact/':'/#contact','/araya/contact-2/':'/#contact',
-            '/index.php':'/','/noris':'/noris/','/comap':'/comap/','/privacy':'/privacy/'}
+            '/index.php':'/','/noris':'/noris/','/comap':'/comap/','/privacy':'/privacy/',
+            '/noris/id':'/noris/id/','/comap/id':'/comap/id/'}
         if path in redirects:return 301,{'Location':BASE+redirects[path]},b''
         if path.startswith('/araya/'):return 410,{},b''
         name=path.lstrip('/')

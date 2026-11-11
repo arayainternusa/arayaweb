@@ -1,6 +1,13 @@
 """Shared consent UI and factual privacy notice for the static site."""
 
-def banner(prefix):
+def banner(prefix, language='en'):
+    if language == 'id':
+        return f'''<section class="consent-banner" id="consent-banner" aria-labelledby="consent-heading" hidden>
+  <h2 id="consent-heading">Pilihan privasi Anda</h2>
+  <p>Dengan izin Anda, kami menggunakan Google Analytics untuk memahami kunjungan dan klik pada tautan kontak. Analitik opsional hanya aktif setelah Anda menyetujuinya. Situs dan tautan kontak tetap dapat digunakan.</p>
+  <p><a href="{prefix}privacy/">Pemberitahuan privasi (English)</a> · <span id="consent-status" role="status" data-accepted="Analitik saat ini diizinkan." data-disabled="Analitik opsional saat ini nonaktif."></span></p>
+  <div class="consent-actions"><button type="button" data-consent-action="reject">Tolak analitik</button><button type="button" data-consent-action="accept">Izinkan analitik</button></div>
+</section>'''
     return f'''<section class="consent-banner" id="consent-banner" aria-labelledby="consent-heading" hidden>
   <h2 id="consent-heading">Your privacy choices</h2>
   <p>With your permission, we use Google Analytics to understand website visits and clicks on our contact links. Optional analytics stays off until you accept. You can use the website and contact us either way.</p>

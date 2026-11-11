@@ -9,6 +9,7 @@ import shutil
 from datetime import datetime, timezone, timedelta
 from brand_profiles import BRANDS
 from brand_pages import brand_content
+from brand_indonesian import GUIDES, indonesian_content, indonesian_title
 from site_content import SERVICES, CLIENTS, BRAND_GROUPS, LEADERSHIP
 from landing_services import service_details, legacy_targets
 from ui_components import srcset
@@ -37,8 +38,9 @@ MAP = "https://www.google.com/maps/search/?api=1&query=" + quote("Gateway Citra 
 JAKARTA_MAP = "https://www.google.com/maps/search/?api=1&query=" + quote("Townhouse PIK, Jakarta")
 
 
-def whatsapp(topic="a project"):
-    return "https://wa.me/6281326396262?text=" + quote(f"Hello Araya, I would like to discuss {topic}.")
+def whatsapp(topic="a project", language="en"):
+    message = f"Halo Araya, saya ingin bertanya tentang {topic}." if language == 'id' else f"Hello Araya, I would like to discuss {topic}."
+    return "https://wa.me/6281326396262?text=" + quote(message)
 
 
 def organization():
@@ -58,20 +60,37 @@ def organization():
     }
 
 
-def breadcrumb(route, name):
+def breadcrumb(route, name, language='en'):
     return {"@type": "BreadcrumbList", "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Home", "item": BASE},
+        {"@type": "ListItem", "position": 1, "name": "Beranda" if language == 'id' else "Home", "item": BASE},
         {"@type": "ListItem", "position": 2, "name": name, "item": BASE + route}]}
 
 
-def shell(title, description, content, route="", schema=()):
-    prefix = "../" if route else "./"
+def shell(title, description, content, route="", schema=(), *, language='en'):
+    prefix = "../" * route.count('/') if route else "./"
     home = prefix + "index.html"
-    brand_links = ''.join(f'<li><a href="{prefix}{key}/">{escape(data["name"])}</a></li>' for key, data in BRANDS.items())
-    brand_footer_links = ''.join(f'<a href="{prefix}{key}/">{escape(data["name"])}</a>' for key, data in BRANDS.items())
-    service_footer_links = ''.join(f'<a href="{home}#{key}-services">{escape(data["name"])}</a>' for key, data in SERVICES.items())
-    contact_topic = (BRANDS.get(route.strip("/")) or SERVICES.get(route.strip("/")) or {}).get("name", "a project")
-    hero_brand = BRANDS.get(route.strip('/'))
+    def ui(english, indonesian):
+        return indonesian if language == 'id' else english
+    brand_suffix = ui('', 'id/')
+    brand_links = ''.join(f'<li><a href="{prefix}{key}/{brand_suffix}">{escape(data["name"])}</a></li>' for key, data in BRANDS.items())
+    brand_footer_links = ''.join(f'<a href="{prefix}{key}/{brand_suffix}">{escape(data["name"])}</a>' for key, data in BRANDS.items())
+    service_names = {'marine': 'Layanan kapal', 'industrial': 'Layanan industri', 'automation': 'Otomasi'}
+    service_footer_links = ''.join(f'<a href="{home}#{key}-services">{escape(ui(data["name"], service_names[key]))}</a>' for key, data in SERVICES.items())
+    route_key = route.split('/')[0]
+    hero_brand = BRANDS.get(route_key)
+    contact_topic = (hero_brand or SERVICES.get(route_key) or {}).get("name", "a project")
+    alternate_links = ''
+    language_switch = ''
+    if hero_brand:
+        versions = {'en': (f'{route_key}/', 'English'), 'id': (f'{route_key}/id/', 'Bahasa Indonesia')}
+        alternate_links = ''.join(f'\n  <link rel="alternate" hreflang="{lang}" href="{BASE}{path}">' for lang, (path, _) in versions.items())
+        choices = []
+        for lang, (path, label) in versions.items():
+            if lang == language:
+                choices.append(f'<span lang="{lang}" aria-current="page">{label}</span>')
+            else:
+                choices.append(f'<a href="{prefix}{path}" lang="{lang}" hreflang="{lang}">{label}</a>')
+        language_switch = f'<div class="brand-language"><nav class="container" aria-label="{ui("Language", "Bahasa")}">{"".join(choices)}</nav></div>'
     tracking_target = BUILD_TARGET if route.strip('/') not in SERVICES else 'off'
     image_preload = ''
     if hero_brand:
@@ -84,7 +103,7 @@ def shell(title, description, content, route="", schema=()):
     def nav(label, target):
         return f'<a href="{home}{target}">{label}</a>'
     return f'''<!doctype html>
-<html lang="en">
+<html lang="{language}">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <script>document.documentElement.classList.add('js')</script>
@@ -92,7 +111,7 @@ def shell(title, description, content, route="", schema=()):
   <meta name="description" content="{escape(description, quote=True)}">
   <meta name="robots" content="{ROBOTS}">{verification}
   <meta name="theme-color" content="#1e2023">
-  <link rel="canonical" href="{BASE}{route}">
+  <link rel="canonical" href="{BASE}{route}">{alternate_links}
   <meta property="og:site_name" content="PT Araya Internusa">
   <meta property="og:title" content="{escape(title, quote=True)}">
   <meta property="og:description" content="{escape(description, quote=True)}">
@@ -111,30 +130,31 @@ def shell(title, description, content, route="", schema=()):
   <script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@graph": [organization(), *schema]}, ensure_ascii=False)}</script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
-{banner(prefix)}
+<a class="skip-link" href="#main">{ui('Skip to content', 'Langsung ke konten')}</a>
+{banner(prefix, language)}
 <header class="site-header">
-  <div class="utility"><div class="container utility-inner"><span>Surabaya &amp; Jakarta Offices</span><a data-contact-location="utility" href="mailto:{EMAIL}">{EMAIL}</a><a data-contact-location="utility" href="{whatsapp()}">WhatsApp: +62 813 2639 6262</a></div></div>
+  <div class="utility"><div class="container utility-inner"><span>{ui('Surabaya &amp; Jakarta Offices', 'Kantor Surabaya &amp; Jakarta')}</span><a data-contact-location="utility" href="mailto:{EMAIL}">{EMAIL}</a><a data-contact-location="utility" href="{whatsapp(ui('a project', 'proyek saya'), language)}">WhatsApp: +62 813 2639 6262</a></div></div>
   <div class="container navigation">
-    <a class="brand" href="{home}" aria-label="PT Araya Internusa home"><img src="{prefix}assets/images/araya-logo.svg" alt="PT Araya Internusa" width="4165" height="961"></a>
+    <a class="brand" href="{home}" aria-label="{ui('PT Araya Internusa home', 'Beranda PT Araya Internusa')}"><img src="{prefix}assets/images/araya-logo.svg" alt="PT Araya Internusa" width="4165" height="961"></a>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation"><span>Menu</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
-    <nav class="main-nav" id="main-navigation" aria-label="Main navigation">
-      {nav('Home', '')}{nav('About Us', '#about')}{nav('Our Services', '#services')}{nav('Our Clients', '#clients')}<details class="brand-menu"><summary>Brand Partners<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><ul class="brand-dropdown">{brand_links}</ul></details>
-      <a class="nav-contact" href="#contact">Contact Us {ARROW}</a>
+    <nav class="main-nav" id="main-navigation" aria-label="{ui('Main navigation', 'Navigasi utama')}">
+      {nav(ui('Home', 'Beranda'), '')}{nav(ui('About Us', 'Tentang Kami'), '#about')}{nav(ui('Our Services', 'Layanan'), '#services')}{nav(ui('Our Clients', 'Klien Kami'), '#clients')}<details class="brand-menu"><summary>{ui('Brand Partners', 'Mitra Merek')}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary><ul class="brand-dropdown">{brand_links}</ul></details>
+      <a class="nav-contact" href="#contact">{ui('Contact Us', 'Hubungi Kami')} {ARROW}</a>
     </nav>
   </div>
 </header>
+{language_switch}
 <main id="main">{content}</main>
 <section class="contact" id="contact" aria-labelledby="contact-heading">
-  <div class="container contact-intro"><div><p class="eyebrow">GET IN TOUCH</p><h2 id="contact-heading">Let’s find the right solution.</h2><p>Send the equipment model, a nameplate photo and the problem or change you need.</p></div><div class="contact-actions"><a class="button" data-contact-location="contact" href="{whatsapp(contact_topic)}">Chat on WhatsApp {ARROW}</a><a class="button button-outline" data-contact-location="contact" href="mailto:{EMAIL}">Email our team {ARROW}</a></div></div>
+  <div class="container contact-intro"><div><p class="eyebrow">{ui('GET IN TOUCH', 'HUBUNGI KAMI')}</p><h2 id="contact-heading">{ui('Let’s find the right solution.', 'Diskusikan kebutuhan Anda')}</h2><p>{ui('Send the equipment model, a nameplate photo and the problem or change you need.', 'Kirim model peralatan, foto pelat nama, serta kendala atau perubahan yang Anda perlukan.')}</p></div><div class="contact-actions"><a class="button" data-contact-location="contact" href="{whatsapp(contact_topic, language)}">{ui('Chat on WhatsApp', 'Hubungi via WhatsApp')} {ARROW}</a><a class="button button-outline" data-contact-location="contact" href="mailto:{EMAIL}">{ui('Email our team', 'Kirim email')} {ARROW}</a></div></div>
   <div class="container footer-grid">
-    <div class="footer-company"><img src="{prefix}assets/images/araya-logo.svg" alt="PT Araya Internusa" width="4165" height="961" loading="lazy"><p><span class="company-age-copy"><span data-company-age>{COMPANY_AGE}</span> years of </span>marine, industrial and automation engineering across Indonesia.</p></div>
-    <div><h3>Explore Araya</h3><a href="{home}#about">About Us</a>{service_footer_links}{brand_footer_links}<a href="{home}#clients">Our Clients</a></div>
-    <div><h3>Branch Offices</h3><p><strong>Surabaya office</strong><a href="{MAP}">Gateway Citra Harmoni RKG 32–33<br>Taman, Sidoarjo<br>Jawa Timur 61257, Indonesia</a></p><p><strong>Jakarta</strong><a href="{JAKARTA_MAP}">Townhouse PIK<br>Jakarta, Indonesia</a></p></div>
-    <div><h3>Contact Us</h3><a data-contact-location="footer" href="mailto:{EMAIL}">{EMAIL}</a><a data-contact-location="footer" href="{whatsapp(contact_topic)}">WhatsApp: +62 813 2639 6262</a><p class="contact-note">Share your system details with our team.</p></div>
+    <div class="footer-company"><img src="{prefix}assets/images/araya-logo.svg" alt="PT Araya Internusa" width="4165" height="961" loading="lazy"><p><span class="company-age-copy"><span data-company-age>{COMPANY_AGE}</span> {ui('years of ', 'tahun pengalaman dalam ')}</span>{ui('marine, industrial and automation engineering across Indonesia.', 'rekayasa kapal, industri, dan otomasi di seluruh Indonesia.')}</p></div>
+    <div><h3>{ui('Explore Araya', 'Jelajahi Araya')}</h3><a href="{home}#about">{ui('About Us', 'Tentang Kami')}</a>{service_footer_links}{brand_footer_links}<a href="{home}#clients">{ui('Our Clients', 'Klien Kami')}</a></div>
+    <div><h3>{ui('Branch Offices', 'Kantor Cabang')}</h3><p><strong>{ui('Surabaya office', 'Kantor Surabaya')}</strong><a href="{MAP}">Gateway Citra Harmoni RKG 32–33<br>Taman, Sidoarjo<br>Jawa Timur 61257, Indonesia</a></p><p><strong>Jakarta</strong><a href="{JAKARTA_MAP}">Townhouse PIK<br>Jakarta, Indonesia</a></p></div>
+    <div><h3>{ui('Contact Us', 'Hubungi Kami')}</h3><a data-contact-location="footer" href="mailto:{EMAIL}">{EMAIL}</a><a data-contact-location="footer" href="{whatsapp(contact_topic, language)}">WhatsApp: +62 813 2639 6262</a><p class="contact-note">{ui('Share your system details with our team.', 'Sampaikan detail sistem Anda kepada tim kami.')}</p></div>
   </div>
 </section>
-<footer class="copyright"><div class="container"><span>© <span class="company-age-copy" data-current-year>{CURRENT_YEAR}</span> PT Araya Internusa.</span><div class="privacy-links"><a href="{prefix}privacy/">Privacy notice</a><button class="privacy-choice" type="button" data-consent-action="open">Privacy choices</button></div></div></footer>
+<footer class="copyright"><div class="container"><span>© <span class="company-age-copy" data-current-year>{CURRENT_YEAR}</span> PT Araya Internusa.</span><div class="privacy-links"><a href="{prefix}privacy/">{ui('Privacy notice', 'Pemberitahuan privasi (English)')}</a><button class="privacy-choice" type="button" data-consent-action="open">{ui('Privacy choices', 'Pilihan privasi')}</button></div></div></footer>
 </body></html>'''
 
 
@@ -169,8 +189,8 @@ def home():
 <section class="section" id="brands"><div class="container">
   <div class="section-heading"><div><p class="eyebrow">BRAND PARTNERS &amp; EQUIPMENT</p><h2>Specialist partners.<br>Multi-brand expertise.</h2></div><p>PT Araya Internusa is an authorised distributor for both NORIS and ComAp in Indonesia. We supply equipment and provide engineering support for both brands.</p></div>
   <div class="brand-grid">
-    <article class="brand-panel"><div class="brand-name">NORIS<span>{escape(BRANDS["noris"]["legal_name"])}</span></div><h3>Instruments &amp; sensors.<br>Marine automation.</h3><p>{escape(BRANDS['noris']['home_summary'])}</p><a class="text-link" href="./noris/">NORIS distributor in Indonesia {ARROW}</a></article>
-    <article class="brand-panel"><div class="brand-name">ComAp<span>{escape(BRANDS["comap"]["legal_name"])}</span></div><h3>Engine control.<br>Power management.<br>Load sharing.</h3><p>{escape(BRANDS['comap']['home_summary'])}</p><a class="text-link" href="./comap/">Explore ComAp in Indonesia {ARROW}</a></article>
+    <article class="brand-panel"><div class="brand-name">NORIS<span>{escape(BRANDS["noris"]["legal_name"])}</span></div><h3>Instruments &amp; sensors.<br>Marine automation.</h3><p>{escape(BRANDS['noris']['home_summary'])}</p><a class="text-link" href="./noris/id/" lang="id">{indonesian_title('noris')} {ARROW}</a></article>
+    <article class="brand-panel"><div class="brand-name">ComAp<span>{escape(BRANDS["comap"]["legal_name"])}</span></div><h3>Engine control.<br>Power management.<br>Load sharing.</h3><p>{escape(BRANDS['comap']['home_summary'])}</p><a class="text-link" href="./comap/id/" lang="id">{indonesian_title('comap')} {ARROW}</a></article>
   </div>
   <div class="equipment-brands"><h3>We also work on equipment from</h3><div class="equipment-brand-grid">{groups}</div><p class="equipment-more">and many more...</p></div>
 </div></section>
@@ -224,6 +244,11 @@ def main():
         # Keep the visible FAQs. Google retired FAQ rich results in May 2026.
         write(key, shell(data['title'], data['description'], brand_content(key, data, ARROW), key + '/', [breadcrumb(key + '/', data['name'])]))
         routes.append(key + '/')
+        route = f'{key}/id/'
+        title = indonesian_title(key)
+        write(route, shell(f'{title} | Araya Internusa', GUIDES[key]['description'],
+                           indonesian_content(key, '../../'), route, [breadcrumb(route, title, 'id')], language='id'))
+        routes.append(route)
     write('privacy', shell('Privacy notice | PT Araya Internusa', 'How PT Araya Internusa handles website analytics, your privacy choices and contact enquiries.', privacy_content(), 'privacy/', [breadcrumb('privacy/', 'Privacy notice')]))
     routes.append('privacy/')
     urls = ''.join(f'<url><loc>{BASE}{route}</loc><lastmod>{datetime.now(timezone(timedelta(hours=7))).date().isoformat()}</lastmod></url>' for route in routes)

@@ -31,7 +31,7 @@ class ProductionTests(unittest.TestCase):
         self.assertEqual(self.preview_before, after)
 
     def test_production_metadata_and_sitemap(self):
-        for route in ('', 'noris/', 'comap/', 'privacy/'):
+        for route in ('', 'noris/', 'comap/', 'noris/id/', 'comap/id/', 'privacy/'):
             html = (PRODUCTION / route / 'index.html').read_text(encoding='utf-8')
             self.assertIn('content="index, follow"', html)
             self.assertIn(f'rel="canonical" href="{BASE}{route}"', html)
@@ -41,11 +41,25 @@ class ProductionTests(unittest.TestCase):
             self.assertNotIn('arayainternusa.github.io', html)
             self.assertNotIn('https://arayainternusa.co.id/araya/', html)
         sitemap = (PRODUCTION / 'sitemap.xml').read_text(encoding='utf-8')
-        self.assertEqual(sitemap.count('<loc>'), 4)
+        self.assertEqual(sitemap.count('<loc>'), 6)
         self.assertIn(f'<loc>{BASE}comap/</loc>', sitemap)
         self.assertIn(f'Sitemap: {BASE}sitemap.xml', (PRODUCTION / 'robots.txt').read_text())
         for key in ('marine', 'industrial', 'automation'):
             self.assertIn('content="noindex, follow"', (PRODUCTION / key / 'index.html').read_text(encoding='utf-8'))
+
+    def test_indonesian_brand_pages_have_reciprocal_language_links(self):
+        home = (PRODUCTION / 'index.html').read_text(encoding='utf-8')
+        for key, name in [('noris', 'NORIS'), ('comap', 'ComAp')]:
+            english = (PRODUCTION / key / 'index.html').read_text(encoding='utf-8')
+            indonesian = (PRODUCTION / key / 'id/index.html').read_text(encoding='utf-8')
+            title = f'Distributor Resmi {name} di Indonesia'
+            self.assertIn('<html lang="id">', indonesian)
+            self.assertIn(f'<title>{title} | Araya Internusa</title>', indonesian)
+            self.assertIn(f'<h1>{title}</h1>', indonesian)
+            self.assertIn(f'href="./{key}/id/" lang="id"', home)
+            for page in (english, indonesian):
+                self.assertIn(f'hreflang="en" href="{BASE}{key}/"', page)
+                self.assertIn(f'hreflang="id" href="{BASE}{key}/id/"', page)
 
     def test_validation_rejects_preview_robots_and_sensitive_files(self):
         home = PRODUCTION / 'index.html'

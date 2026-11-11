@@ -3,13 +3,20 @@ from html import escape
 from ui_components import disclosure_summary
 
 
+def hero_product_figure(data, prefix='../', *, alt=None, caption=None):
+    cover = ' hero-product-cover' if data.get('image_cover') else ''
+    alt = escape(data['alt'] if alt is None else alt, quote=True)
+    caption = escape(data['image_caption'] if caption is None else caption)
+    return f'<figure class="product-figure hero-product{cover}"><img src="{prefix}assets/images/{data["image"]}" alt="{alt}" width="{data["image_width"]}" height="{data["image_height"]}" fetchpriority="high"><figcaption>{caption}</figcaption></figure>'
 
-def portfolio_image(product, brand):
+
+
+def portfolio_image(product, brand, *, prefix='../', image_credit='Image', loading='eager'):
     """Optional local manufacturer image; never imply an Araya installation."""
     if 'image' not in product:
         return ''
     picture = product['image']
-    return f'''<figure class="portfolio-picture"><img src="../assets/images/{escape(picture['file'], quote=True)}" alt="{escape(picture['alt'], quote=True)}" width="{picture['width']}" height="{picture['height']}" loading="eager" fetchpriority="low" decoding="async"><figcaption>{escape(picture['caption'])} · Image: {escape(brand)}</figcaption></figure>'''
+    return f'''<figure class="portfolio-picture"><img src="{prefix}assets/images/{escape(picture['file'], quote=True)}" alt="{escape(picture['alt'], quote=True)}" width="{picture['width']}" height="{picture['height']}" loading="{loading}" fetchpriority="low" decoding="async"><figcaption>{escape(picture['caption'])} · {escape(image_credit)}: {escape(brand)}</figcaption></figure>'''
 
 
 def diagram_figure(diagram, source=None, brand='ComAp', *, defer=True):
@@ -74,7 +81,7 @@ def brand_content(key, data, arrow):
     faqs = ''.join(f'<details>{disclosure_summary(question)}<p>{escape(answer)}</p></details>' for question, answer in data['faqs'])
     return f'''<section class="brand-hero brand-landing"><div class="container">
       <div class="brand-landing-grid"><div><p class="eyebrow">{escape(data['label'])}</p><h1>{data['heading']}</h1><p class="brand-intro">{escape(data['intro'])}</p></div>
-      <figure class="product-figure hero-product"><img src="../assets/images/{data['image']}" alt="{escape(data['alt'], quote=True)}" width="{data['image_width']}" height="{data['image_height']}" fetchpriority="high"><figcaption>{escape(data['image_caption'])}</figcaption></figure></div>
+      {hero_product_figure(data)}</div>
     </div></section>
     <section class="section section-compact" id="about-brand"><div class="container"><div class="brand-profile"><div><p class="eyebrow">THE MANUFACTURER</p><h2>About {name}</h2></div><div><p>{escape(data['profile'])}</p><p>{escape(data['local'])}</p></div></div><dl class="brand-facts">{facts}</dl></div></section>
     {brand_contents(data)}

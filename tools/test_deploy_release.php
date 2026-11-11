@@ -14,7 +14,8 @@ try {
     check(!valid_release_id('../bad') && !valid_release_id(str_repeat('a',40).'-0-1'), 'bad release accepted');
     $payload = $folder . '/payload'; mkdir($payload);
     $sha = str_repeat('a',40);
-    $files = ['index.html'=>'home','noris/index.html'=>'noris','comap/index.html'=>'comap','privacy/index.html'=>'privacy',
+    $files = ['index.html'=>'home','noris/index.html'=>'noris','comap/index.html'=>'comap',
+        'noris/id/index.html'=>'noris id','comap/id/index.html'=>'comap id','privacy/index.html'=>'privacy',
         'marine/index.html'=>'marine','industrial/index.html'=>'industrial','automation/index.html'=>'automation',
         'robots.txt'=>'robots','sitemap.xml'=>'sitemap','assets/site.css'=>'css','assets/site.js'=>'js',
         'assets/company-date.js'=>'date','assets/service-redirect.js'=>'redirect','assets/measurement.js'=>'measurement','assets/measurement.css'=>'consent styles',
@@ -28,7 +29,7 @@ try {
         return [$m['archive_sha256'],hash_file('sha256',$payload.'/release.json')];
     }
     [$a,$m]=package_fixture($payload,$sha,$files);
-    check(count(verify_package($payload,$sha,$a,$m)['files'])===17,'valid package failed');
+    check(count(verify_package($payload,$sha,$a,$m)['files'])===19,'valid package failed');
     rejects(function()use($payload,$sha,$m){verify_package($payload,$sha,str_repeat('0',64),$m);});
     $bad=$files; $bad['../escape.txt']='bad'; [$a,$m]=package_fixture($payload,$sha,$bad);
     rejects(function()use($payload,$sha,$a,$m){verify_package($payload,$sha,$a,$m);});
