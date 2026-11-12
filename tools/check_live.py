@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
-from check import CONTENT_ROUTES
+from check import CONTENT_ROUTES, SERVICE_PAGE_ROUTES
 
 BASE = 'https://arayainternusa.co.id'
 class NoRedirect(HTTPRedirectHandler):
@@ -45,7 +45,8 @@ def check(manifest_path):
         '/araya/services/industrial/':'/#industrial-services', '/araya/services/automation/':'/#automation-services',
         '/araya/team/':'/#leadership','/araya/contact/':'/#contact','/araya/contact-2/':'/#contact',
         '/index.php':'/','/noris':'/noris/','/comap':'/comap/','/privacy':'/privacy/',
-        '/noris/id':'/noris/id/','/comap/id':'/comap/id/'}
+        '/noris/id':'/noris/id/','/comap/id':'/comap/id/',
+        **{f'/{route.rstrip("/")}': f'/{route}' for route in SERVICE_PAGE_ROUTES}}
     for source, target in redirects.items():
         code, headers, _ = fetch(BASE+source)
         location = headers.get('Location', '')

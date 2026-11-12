@@ -15,7 +15,13 @@ try {
     $payload = $folder . '/payload'; mkdir($payload);
     $sha = str_repeat('a',40);
     $files = ['index.html'=>'home','noris/index.html'=>'noris','comap/index.html'=>'comap',
-        'noris/id/index.html'=>'noris id','comap/id/index.html'=>'comap id','privacy/index.html'=>'privacy',
+        'noris/id/index.html'=>'noris id','comap/id/index.html'=>'comap id','privacy/index.html'=>'privacy','instalasi-fire-alarm/index.html'=>'fire alarm',
+        'perbaikan-kapal-surabaya-gresik/index.html'=>'ship repair',
+        'perbaikan-kelistrikan-kapal/index.html'=>'ship electrical',
+        'perbaikan-mesin-kapal/index.html'=>'ship engine repair',
+        'retrofit-kontrol-monitoring-kapal/index.html'=>'control retrofit',
+        'perbaikan-kemudi-manuver-kapal/index.html'=>'steering and manoeuvring',
+        'perbaikan-crane-kapal-industri/index.html'=>'marine and industrial cranes',
         'marine/index.html'=>'marine','industrial/index.html'=>'industrial','automation/index.html'=>'automation',
         'robots.txt'=>'robots','sitemap.xml'=>'sitemap','assets/site.css'=>'css','assets/site.js'=>'js',
         'assets/company-date.js'=>'date','assets/service-redirect.js'=>'redirect','assets/measurement.js'=>'measurement','assets/measurement.css'=>'consent styles',
@@ -29,7 +35,7 @@ try {
         return [$m['archive_sha256'],hash_file('sha256',$payload.'/release.json')];
     }
     [$a,$m]=package_fixture($payload,$sha,$files);
-    check(count(verify_package($payload,$sha,$a,$m)['files'])===19,'valid package failed');
+    check(count(verify_package($payload,$sha,$a,$m)['files'])===count($files),'valid package failed');
     rejects(function()use($payload,$sha,$m){verify_package($payload,$sha,str_repeat('0',64),$m);});
     $bad=$files; $bad['../escape.txt']='bad'; [$a,$m]=package_fixture($payload,$sha,$bad);
     rejects(function()use($payload,$sha,$a,$m){verify_package($payload,$sha,$a,$m);});

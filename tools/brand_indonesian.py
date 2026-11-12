@@ -8,7 +8,6 @@ GUIDES = {
     'noris': {
         'description': 'PT Araya Internusa adalah distributor resmi tunggal NORIS di Indonesia. Tanyakan sensor, instrumen, noriMos, noriStar, dan noriNet.',
         'hero_alt': 'Panel anjungan noriStar NORIS dengan dua layar dan dua tuas kontrol propulsi',
-        'hero_caption': 'Panel anjungan noriStar · Foto produk Noris Group GmbH',
         'groups': (
             ('Sensor dan instrumen', (
                 ('speed-sensors', 'Sensor putaran NORIS FAH13 dan FAJ13', 'Mengukur putaran mesin atau poros. Untuk mencari pengganti, kirim kode lengkap, foto sensor, jenis pemasangan, dan sinyal keluarannya jika diketahui.'),
@@ -27,7 +26,6 @@ GUIDES = {
     'comap': {
         'description': 'PT Araya Internusa adalah distributor resmi ComAp di Indonesia untuk kontrol mesin, sinkronisasi genset, load sharing, dan manajemen daya kapal.',
         'hero_alt': 'Modul kontrol genset paralel ComAp InteliGen 500 G2',
-        'hero_caption': 'InteliGen 500 G2 · Foto produk ComAp',
         'applications': (
             ('Sinkronisasi genset kapal dan industri', 'Saat beberapa genset diparalelkan, controller mengatur sinkronisasi, pemutus sirkuit, dan pembagian beban. Pemilihan modul mempertimbangkan jumlah genset, daya, governor, AVR, dan diagram satu garis.'),
             ('Manajemen daya dan kontrol mesin kapal', 'Sistem manajemen daya mengatur koordinasi sumber listrik di kapal. Kontrol mesin menangani perintah operasi, alarm, dan proteksi untuk mesin propulsi atau mesin bantu.'),
@@ -53,10 +51,9 @@ def indonesian_title(key):
     return f'Distributor Resmi {BRANDS[key]["name"]} di Indonesia'
 
 
-def system_figure(diagram, caption, alt, prefix, brand):
+def system_figure(diagram, alt, prefix):
     return f'''<figure class="application-diagram"><img src="{prefix}assets/images/{diagram['file']}"
-      width="{diagram['width']}" height="{diagram['height']}" alt="{escape(alt, quote=True)}" loading="lazy" decoding="async">
-      <figcaption>{escape(caption)} · Diagram {escape(brand)}</figcaption></figure>'''
+      width="{diagram['width']}" height="{diagram['height']}" alt="{escape(alt, quote=True)}" loading="lazy" decoding="async"></figure>'''
 
 
 def indonesian_content(key, prefix):
@@ -70,8 +67,8 @@ def indonesian_content(key, prefix):
     )
     application_section = ''
     if applications:
-        diagram = system_figure(brand['application_groups'][0]['diagram'], 'Contoh manajemen daya AC di kapal',
-                                'Susunan genset, busbar, dan suplai listrik dari darat', prefix, brand['name'])
+        diagram = system_figure(brand['application_groups'][0]['diagram'],
+                                'Susunan genset, busbar, dan suplai listrik dari darat', prefix)
         application_section = (
             f'<section class="section" id="applications"><div class="container"><h2>Aplikasi ComAp</h2>'
             f'<div class="application-group-intro"><div class="scope-details">{applications}</div>{diagram}</div></div></section>'
@@ -81,13 +78,12 @@ def indonesian_content(key, prefix):
         rows = []
         for anchor, label, body in items:
             product = products[anchor]
-            image = {**product['image'], 'alt': label, 'caption': label}
-            figure = portfolio_image({**product, 'image': image}, brand['legal_name'], prefix=prefix,
-                                     image_credit='Foto produk', loading='lazy')
+            image = {**product['image'], 'alt': label}
+            figure = portfolio_image({**product, 'image': image}, prefix=prefix, loading='lazy')
             if anchor == 'norinet':
-                figure += system_figure(product['diagram'], 'Arsitektur noriNet dari kapal ke darat',
+                figure += system_figure(product['diagram'],
                                         'Aliran data dari sistem di kapal melalui unit antarmuka ke layanan pemantauan di darat',
-                                        prefix, brand['legal_name'])
+                                        prefix)
             rows.append(f'<article class="portfolio-row" id="{anchor}"><div>{figure}</div>'
                         f'<div><h4>{escape(label)}</h4><p>{escape(body)}</p></div></article>')
         groups.append(f'<section class="portfolio-group"><h3 class="portfolio-group-title">{escape(heading)}</h3>'
@@ -98,7 +94,7 @@ def indonesian_content(key, prefix):
     return f'''<section class="brand-hero brand-landing"><div class="container">
       <div class="brand-landing-grid"><div><p class="eyebrow">{escape(brand['legal_name'])}</p><h1>{title}</h1>
       <p class="brand-intro">{escape(guide['description'])} Kami melayani pengadaan dan dukungan teknis dari kantor Surabaya dan Jakarta untuk proyek di seluruh Indonesia.</p></div>
-      {hero_product_figure(brand, prefix, alt=guide['hero_alt'], caption=guide['hero_caption'])}</div>
+      {hero_product_figure(brand, prefix, alt=guide['hero_alt'])}</div>
     </div></section>
 {application_section}
     <section class="section section-muted" id="portfolio"><div class="container"><h2>Produk {escape(brand['name'])}</h2><div class="portfolio-list">{"".join(groups)}</div></div></section>

@@ -8,6 +8,7 @@ import unittest
 import zipfile
 import tempfile
 from package_release import git_provenance
+from check import SERVICE_PAGE_ROUTES
 
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION = ROOT / 'dist/production'
@@ -31,7 +32,7 @@ class ProductionTests(unittest.TestCase):
         self.assertEqual(self.preview_before, after)
 
     def test_production_metadata_and_sitemap(self):
-        for route in ('', 'noris/', 'comap/', 'noris/id/', 'comap/id/', 'privacy/'):
+        for route in ('', 'noris/', 'comap/', 'noris/id/', 'comap/id/', 'privacy/', *SERVICE_PAGE_ROUTES):
             html = (PRODUCTION / route / 'index.html').read_text(encoding='utf-8')
             self.assertIn('content="index, follow"', html)
             self.assertIn(f'rel="canonical" href="{BASE}{route}"', html)
@@ -41,7 +42,7 @@ class ProductionTests(unittest.TestCase):
             self.assertNotIn('arayainternusa.github.io', html)
             self.assertNotIn('https://arayainternusa.co.id/araya/', html)
         sitemap = (PRODUCTION / 'sitemap.xml').read_text(encoding='utf-8')
-        self.assertEqual(sitemap.count('<loc>'), 6)
+        self.assertEqual(sitemap.count('<loc>'), 6 + len(SERVICE_PAGE_ROUTES))
         self.assertIn(f'<loc>{BASE}comap/</loc>', sitemap)
         self.assertIn(f'Sitemap: {BASE}sitemap.xml', (PRODUCTION / 'robots.txt').read_text())
         for key in ('marine', 'industrial', 'automation'):
@@ -88,6 +89,7 @@ class ProductionTests(unittest.TestCase):
         with zipfile.ZipFile(archive_path) as archive:
             self.assertEqual(set(archive.namelist()), set(manifest['files']))
             self.assertIn('index.html', archive.namelist())
+            self.assertTrue(all(f'{route}index.html' in manifest['files'] for route in SERVICE_PAGE_ROUTES))
             self.assertIn('assets/site.css', archive.namelist())
             self.assertFalse(any(n.startswith(('public/', 'tools/', '.git/', 'docs/')) for n in archive.namelist()))
             for name in archive.namelist():

@@ -10,6 +10,8 @@ from datetime import datetime, timezone, timedelta
 from brand_profiles import BRANDS
 from brand_pages import brand_content
 from brand_indonesian import GUIDES, indonesian_content, indonesian_title
+import fire_alarm
+from ship_service_pages import PAGES as SHIP_SERVICE_PAGES, SHIP_REPAIR, service_content
 from site_content import SERVICES, CLIENTS, BRAND_GROUPS, LEADERSHIP
 from landing_services import service_details, legacy_targets
 from ui_components import srcset
@@ -66,7 +68,14 @@ def breadcrumb(route, name, language='en'):
         {"@type": "ListItem", "position": 2, "name": name, "item": BASE + route}]}
 
 
-def shell(title, description, content, route="", schema=(), *, language='en'):
+def service_metadata(route, name, description, areas):
+    return [breadcrumb(route, name, 'id'), {
+        '@type': 'Service', 'name': name, 'description': description, 'url': BASE + route,
+        'provider': {'@id': BASE + '#organization'}, 'areaServed': areas,
+    }]
+
+
+def shell(title, description, content, route="", schema=(), *, language='en', contact_topic=None, contact_hint=None):
     prefix = "../" * route.count('/') if route else "./"
     home = prefix + "index.html"
     def ui(english, indonesian):
@@ -78,7 +87,11 @@ def shell(title, description, content, route="", schema=(), *, language='en'):
     service_footer_links = ''.join(f'<a href="{home}#{key}-services">{escape(ui(data["name"], service_names[key]))}</a>' for key, data in SERVICES.items())
     route_key = route.split('/')[0]
     hero_brand = BRANDS.get(route_key)
-    contact_topic = (hero_brand or SERVICES.get(route_key) or {}).get("name", "a project")
+    contact_topic = contact_topic or (hero_brand or SERVICES.get(route_key) or {}).get("name", "a project")
+    contact_hint = contact_hint or ui(
+        'Send the equipment model, a nameplate photo and the problem or change you need.',
+        'Kirim model peralatan, foto pelat nama, serta kendala atau perubahan yang Anda perlukan.',
+    )
     alternate_links = ''
     language_switch = ''
     if hero_brand:
@@ -146,7 +159,7 @@ def shell(title, description, content, route="", schema=(), *, language='en'):
 {language_switch}
 <main id="main">{content}</main>
 <section class="contact" id="contact" aria-labelledby="contact-heading">
-  <div class="container contact-intro"><div><p class="eyebrow">{ui('GET IN TOUCH', 'HUBUNGI KAMI')}</p><h2 id="contact-heading">{ui('Let’s find the right solution.', 'Diskusikan kebutuhan Anda')}</h2><p>{ui('Send the equipment model, a nameplate photo and the problem or change you need.', 'Kirim model peralatan, foto pelat nama, serta kendala atau perubahan yang Anda perlukan.')}</p></div><div class="contact-actions"><a class="button" data-contact-location="contact" href="{whatsapp(contact_topic, language)}">{ui('Chat on WhatsApp', 'Hubungi via WhatsApp')} {ARROW}</a><a class="button button-outline" data-contact-location="contact" href="mailto:{EMAIL}">{ui('Email our team', 'Kirim email')} {ARROW}</a></div></div>
+  <div class="container contact-intro"><div><p class="eyebrow">{ui('GET IN TOUCH', 'HUBUNGI KAMI')}</p><h2 id="contact-heading">{ui('Let’s find the right solution.', 'Diskusikan kebutuhan Anda')}</h2><p>{escape(contact_hint)}</p></div><div class="contact-actions"><a class="button" data-contact-location="contact" href="{whatsapp(contact_topic, language)}">{ui('Chat on WhatsApp', 'Hubungi via WhatsApp')} {ARROW}</a><a class="button button-outline" data-contact-location="contact" href="mailto:{EMAIL}">{ui('Email our team', 'Kirim email')} {ARROW}</a></div></div>
   <div class="container footer-grid">
     <div class="footer-company"><img src="{prefix}assets/images/araya-logo.svg" alt="PT Araya Internusa" width="4165" height="961" loading="lazy"><p><span class="company-age-copy"><span data-company-age>{COMPANY_AGE}</span> {ui('years of ', 'tahun pengalaman dalam ')}</span>{ui('marine, industrial and automation engineering across Indonesia.', 'rekayasa kapal, industri, dan otomasi di seluruh Indonesia.')}</p></div>
     <div><h3>{ui('Explore Araya', 'Jelajahi Araya')}</h3><a href="{home}#about">{ui('About Us', 'Tentang Kami')}</a>{service_footer_links}{brand_footer_links}<a href="{home}#clients">{ui('Our Clients', 'Klien Kami')}</a></div>
@@ -179,7 +192,10 @@ def home():
 <section class="section section-muted" id="services"><div class="container">
   <div class="section-heading"><div><p class="eyebrow">WHAT WE DO</p><h2>Our services</h2></div><p>Supply, repair, upgrade and retrofit for marine and industrial systems.</p></div>
   <div class="landing-services">{service_sections}</div>
-
+  <div class="service-page-link" lang="id">
+    <a class="text-link" href="./{SHIP_REPAIR}/">{escape(SHIP_SERVICE_PAGES[SHIP_REPAIR].heading)} {ARROW}</a>
+    <a class="text-link" href="./{fire_alarm.ROUTE}">{escape(fire_alarm.HEADING)} {ARROW}</a>
+  </div>
 </div></section>
 <section class="section projects" id="clients"><div class="container">
   <div class="section-heading"><div><p class="eyebrow">OUR CLIENTS</p><h2>Clients who<br>trust Araya.</h2></div><p>Organisations that trust PT Araya Internusa with their engineering and automation work.</p></div>
@@ -248,6 +264,20 @@ def main():
         title = indonesian_title(key)
         write(route, shell(f'{title} | Araya Internusa', GUIDES[key]['description'],
                            indonesian_content(key, '../../'), route, [breadcrumb(route, title, 'id')], language='id'))
+        routes.append(route)
+    local_service_areas = [{'@type': 'City', 'name': 'Surabaya'},
+                           {'@type': 'AdministrativeArea', 'name': 'Gresik'}]
+    route = fire_alarm.ROUTE
+    write(route, shell(fire_alarm.TITLE, fire_alarm.DESCRIPTION, fire_alarm.fire_alarm_content(), route,
+                       service_metadata(route, fire_alarm.HEADING, fire_alarm.DESCRIPTION, local_service_areas),
+                       language='id', contact_topic='sistem fire alarm', contact_hint=fire_alarm.CONTACT_HINT))
+    routes.append(route)
+    ship_service_areas = [*local_service_areas, {'@type': 'Country', 'name': 'Indonesia'}]
+    for slug, page in SHIP_SERVICE_PAGES.items():
+        route = f'{slug}/'
+        write(route, shell(f'{page.title} | Araya', page.description, service_content(page, ARROW), route,
+                           service_metadata(route, page.heading, page.description, ship_service_areas),
+                           language='id', contact_topic=page.contact_topic, contact_hint=page.contact_hint))
         routes.append(route)
     write('privacy', shell('Privacy notice | PT Araya Internusa', 'How PT Araya Internusa handles website analytics, your privacy choices and contact enquiries.', privacy_content(), 'privacy/', [breadcrumb('privacy/', 'Privacy notice')]))
     routes.append('privacy/')

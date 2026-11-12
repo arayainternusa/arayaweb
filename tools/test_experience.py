@@ -5,6 +5,14 @@ from pathlib import Path
 from urllib.parse import urlsplit, parse_qs
 
 PUBLIC = Path(__file__).resolve().parents[1] / 'public'
+SHIP_SERVICE_TOPICS = {
+    'perbaikan-kapal-surabaya-gresik': 'perbaikan kapal',
+    'perbaikan-kelistrikan-kapal': 'kelistrikan kapal',
+    'perbaikan-mesin-kapal': 'perbaikan mesin kapal (ME & AE)',
+    'retrofit-kontrol-monitoring-kapal': 'otomasi dan monitoring kapal',
+    'perbaikan-kemudi-manuver-kapal': 'sistem kemudi dan manuver kapal',
+    'perbaikan-crane-kapal-industri': 'perbaikan crane kapal atau industri',
+}
 
 
 class Links(HTMLParser):
@@ -62,7 +70,49 @@ class ExperienceTests(unittest.TestCase):
                 self.assertNotIn(f'href="./{service}/"', (PUBLIC / page).read_text(encoding='utf-8'))
                 self.assertNotIn(f'href="../{service}/"', (PUBLIC / page).read_text(encoding='utf-8'))
         sitemap = (PUBLIC / 'sitemap.xml').read_text(encoding='utf-8')
-        self.assertEqual(sitemap.count('<url>'), 6)  # Five marketing pages plus the privacy notice.
+        self.assertIn('/instalasi-fire-alarm/</loc>', sitemap)
+        self.assertEqual(sitemap.count('<url>'), 7 + len(SHIP_SERVICE_TOPICS))
+
+    def test_fire_alarm_service_discovery_and_enquiry(self):
+        home = Links(PUBLIC / 'index.html').links
+        self.assertTrue(any(link['href'] == './instalasi-fire-alarm/' for link in home))
+        page = Links(PUBLIC / 'instalasi-fire-alarm/index.html').links
+        whatsapp = next(link for link in page if link.get('data-contact-location') == 'contact'
+                        and urlsplit(link['href']).netloc == 'wa.me')
+        self.assertIn('sistem fire alarm', parse_qs(urlsplit(whatsapp['href']).query)['text'][0])
+
+    def test_ship_service_pages_are_discoverable_and_keep_the_enquiry_topic(self):
+        hub = 'perbaikan-kapal-surabaya-gresik'
+        home = Links(PUBLIC / 'index.html').links
+        self.assertIn(f'./{hub}/', [link['href'] for link in home])
+        hub_links = [link['href'] for link in Links(PUBLIC / hub / 'index.html').links]
+        self.assertIn('../instalasi-fire-alarm/', hub_links)
+        sitemap = (PUBLIC / 'sitemap.xml').read_text(encoding='utf-8')
+        for slug, topic in SHIP_SERVICE_TOPICS.items():
+            with self.subTest(page=slug):
+                self.assertIn(f'/{slug}/</loc>', sitemap)
+                path = PUBLIC / slug / 'index.html'
+                html = path.read_text(encoding='utf-8')
+                self.assertIn('<html lang="id">', html)
+                self.assertNotIn('<figcaption>', html)
+                if slug == 'perbaikan-kelistrikan-kapal':
+                    self.assertIn('<h1>Instalasi dan Perbaikan Kelistrikan Kapal</h1>', html)
+                    self.assertIn('<h3>Panel Listrik &amp; Switchboard Kapal</h3>', html)
+                if slug == 'perbaikan-mesin-kapal':
+                    self.assertIn('motor induk (ME) dan motor bantu (AE)', html)
+                    self.assertIn('<h3>Safety Device &amp; Kontrol Mesin</h3>', html)
+                    self.assertNotIn('genset', html.lower())
+                if slug == 'retrofit-kontrol-monitoring-kapal':
+                    self.assertIn('<h1>Otomasi &amp; Monitoring Kapal</h1>', html)
+                    self.assertIn('<h3>General Alarm Kapal</h3>', html)
+                    self.assertIn('<h3>Alarm Monitoring System (AMS)</h3>', html)
+                links = Links(html=html).links
+                whatsapp = next(link for link in links if link.get('data-contact-location') == 'contact'
+                                and urlsplit(link['href']).netloc == 'wa.me')
+                self.assertIn(topic, parse_qs(urlsplit(whatsapp['href']).query)['text'][0])
+                if slug != hub:
+                    self.assertIn(f'../{slug}/', hub_links)
+                    self.assertIn(f'../{hub}/', [link['href'] for link in links])
 
     def test_service_sectors_contain_scopes_without_repeated_promotions(self):
         import re

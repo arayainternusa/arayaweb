@@ -6,10 +6,14 @@ import sys
 import argparse
 import json
 import xml.etree.ElementTree as ET
+from fire_alarm import ROUTE as FIRE_ALARM_ROUTE
+from ship_service_pages import PAGES as SHIP_SERVICE_PAGES
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
-CONTENT_ROUTES = {'index.html', 'noris/index.html', 'comap/index.html', 'noris/id/index.html', 'comap/id/index.html', 'privacy/index.html'}
+SERVICE_PAGE_ROUTES = (FIRE_ALARM_ROUTE, *(f'{slug}/' for slug in SHIP_SERVICE_PAGES))
+CONTENT_ROUTES = {'index.html', 'noris/index.html', 'comap/index.html', 'noris/id/index.html', 'comap/id/index.html',
+                  'privacy/index.html', *(f'{route}index.html' for route in SERVICE_PAGE_ROUTES)}
 ALL_ROUTES = CONTENT_ROUTES | {f'{key}/index.html' for key in ('marine', 'industrial', 'automation')}
 ASSET_SUFFIXES = {'.css', '.js', '.woff2', '.webp', '.jpg', '.jpeg', '.png', '.svg', '.pdf'}
 
