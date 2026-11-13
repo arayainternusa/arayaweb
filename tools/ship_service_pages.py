@@ -6,7 +6,8 @@ from html import escape
 from fire_alarm import HEADING as FIRE_ALARM_HEADING, ROUTE as FIRE_ALARM_ROUTE
 
 
-SHIP_REPAIR = 'perbaikan-kapal-surabaya-gresik'
+SHIP_REPAIR = 'perbaikan-kapal'
+LEGACY_SHIP_REPAIR = 'perbaikan-kapal-surabaya-gresik'
 ELECTRICAL = 'perbaikan-kelistrikan-kapal'
 ENGINES = 'perbaikan-mesin-kapal'
 RETROFIT = 'retrofit-kontrol-monitoring-kapal'
@@ -35,10 +36,10 @@ class ServicePage:
 
 PAGES = {
     SHIP_REPAIR: ServicePage(
-        heading='Jasa Perbaikan Kapal di Surabaya & Gresik',
-        title='Jasa Perbaikan Kapal Surabaya & Gresik',
-        description='Jasa perawatan, perbaikan dan retrofit kapal di Surabaya dan Gresik. Kelistrikan, genset, sistem kontrol, kemudi, crane, dan fire alarm kapal.',
-        intro='PT Araya Internusa menangani perawatan, perbaikan, dan retrofit sistem kapal di Surabaya dan Gresik. Kami juga melayani pekerjaan kapal di wilayah lain di Indonesia.',
+        heading='Jasa Perbaikan Kapal di Indonesia',
+        title='Jasa Perbaikan Kapal di Indonesia',
+        description='Jasa perawatan, perbaikan, dan retrofit kapal di seluruh Indonesia, termasuk Surabaya dan Gresik. Mesin, kelistrikan, sistem kontrol, kemudi, crane, dan fire alarm.',
+        intro='PT Araya Internusa menangani perawatan, perbaikan, dan retrofit sistem kapal di seluruh Indonesia, termasuk Surabaya dan Gresik. Kantor kami berada di Surabaya dan Jakarta.',
         scopes=(
             ('Perawatan sistem kapal', 'Pemeriksaan sistem kelistrikan, mesin bantu, kontrol, dan pemantauan di kapal.'),
             ('Perbaikan gangguan', 'Penelusuran gangguan dan perbaikan peralatan kapal, termasuk panel, genset, dan kontrol kemudi.'),

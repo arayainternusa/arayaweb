@@ -7,7 +7,7 @@ import argparse
 import json
 import xml.etree.ElementTree as ET
 from fire_alarm import ROUTE as FIRE_ALARM_ROUTE
-from ship_service_pages import PAGES as SHIP_SERVICE_PAGES
+from ship_service_pages import LEGACY_SHIP_REPAIR, PAGES as SHIP_SERVICE_PAGES, SHIP_REPAIR
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
@@ -24,6 +24,7 @@ class Page(HTMLParser):
         self.path, self.links, self.ids, self.errors = path, [], set(), []
         self.h1, self.description, self.robots = 0, None, None
         self.canonical, self.og_url = None, None
+        self.refresh = None
         self.schema, self.in_schema = '', False
         self.feed(path.read_text(encoding="utf-8"))
 
@@ -35,6 +36,8 @@ class Page(HTMLParser):
             self.ids.add(data["id"])
         self.h1 += tag == "h1"
         if tag == "meta":
+            if data.get("http-equiv") == "refresh":
+                self.refresh = data.get("content")
             if data.get("name") == "description":
                 self.description = data.get("content")
             if data.get("name") == "robots":
@@ -70,6 +73,14 @@ def main():
     base = 'https://arayainternusa.co.id/' if production else 'https://arayainternusa.github.io/arayaweb/'
     pages = {path.resolve(): Page(path) for path in PUBLIC.rglob("*.html")}
     errors = []
+    if not production:
+        old_path = (PUBLIC / LEGACY_SHIP_REPAIR / 'index.html').resolve()
+        redirect = pages.pop(old_path, None)
+        target = f'../{SHIP_REPAIR}/'
+        if (not redirect or redirect.h1 != 1 or redirect.robots != 'noindex, nofollow'
+                or redirect.refresh != f'0;url={target}' or redirect.canonical != f'{base}{SHIP_REPAIR}/'
+                or target not in redirect.links or redirect.errors):
+            errors.append('Invalid preview redirect for the old ship repair URL')
     if {p.relative_to(PUBLIC.resolve()).as_posix() for p in pages} != ALL_ROUTES:
         errors.append('Expected all content pages and three compatibility routes')
     for path, page in pages.items():
@@ -129,7 +140,7 @@ def main():
     if errors:
         print("\n".join(errors))
         return 1
-    print(f"PASS {args.target}: {len(pages)} pages; local assets/fragments, metadata, image alt text, font, publication files and no-PR workflows.")
+    print(f"PASS {args.target}: local assets/fragments, metadata, redirects, image alt text, font, publication files and no-PR workflows.")
     return 0
 
 

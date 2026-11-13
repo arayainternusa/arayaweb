@@ -6,7 +6,7 @@ from urllib.parse import urlsplit, parse_qs
 
 PUBLIC = Path(__file__).resolve().parents[1] / 'public'
 SHIP_SERVICE_TOPICS = {
-    'perbaikan-kapal-surabaya-gresik': 'perbaikan kapal',
+    'perbaikan-kapal': 'perbaikan kapal',
     'perbaikan-kelistrikan-kapal': 'kelistrikan kapal',
     'perbaikan-mesin-kapal': 'perbaikan mesin kapal (ME & AE)',
     'retrofit-kontrol-monitoring-kapal': 'otomasi dan monitoring kapal',
@@ -29,7 +29,7 @@ class Links(HTMLParser):
 class ExperienceTests(unittest.TestCase):
     def test_contact_keeps_current_page(self):
         for path in PUBLIC.rglob('index.html'):
-            if path.parent.name in {'marine', 'industrial', 'automation'}:
+            if path.parent.name in {'marine', 'industrial', 'automation', 'perbaikan-kapal-surabaya-gresik'}:
                 continue  # These URLs are now compatibility redirects.
             with self.subTest(page=path.parent.name):
                 link = next(a for a in Links(path).links if a.get('class') == 'nav-contact')
@@ -82,9 +82,10 @@ class ExperienceTests(unittest.TestCase):
         self.assertIn('sistem fire alarm', parse_qs(urlsplit(whatsapp['href']).query)['text'][0])
 
     def test_ship_service_pages_are_discoverable_and_keep_the_enquiry_topic(self):
-        hub = 'perbaikan-kapal-surabaya-gresik'
-        home = Links(PUBLIC / 'index.html').links
-        self.assertIn(f'./{hub}/', [link['href'] for link in home])
+        hub = 'perbaikan-kapal'
+        home = (PUBLIC / 'index.html').read_text(encoding='utf-8')
+        footer = home.split('class="container footer-grid"', 1)[1]
+        self.assertIn(f'./{hub}/', [link['href'] for link in Links(html=footer).links])
         hub_links = [link['href'] for link in Links(PUBLIC / hub / 'index.html').links]
         self.assertIn('../instalasi-fire-alarm/', hub_links)
         sitemap = (PUBLIC / 'sitemap.xml').read_text(encoding='utf-8')
@@ -121,7 +122,15 @@ class ExperienceTests(unittest.TestCase):
         for key, service in SERVICES.items():
             with self.subTest(sector=key):
                 block = re.search(rf'<article class="service-feature" id="{key}-services".*?</details></article>', html, re.S).group()
-                self.assertEqual(Links(html=block).links, [])
+                intro, details = block.split('<details', 1)
+                self.assertEqual(Links(html=intro).links, [])
+                expected_links = {
+                    './instalasi-fire-alarm/', './perbaikan-kelistrikan-kapal/',
+                    './perbaikan-mesin-kapal/', './retrofit-kontrol-monitoring-kapal/',
+                    './perbaikan-kemudi-manuver-kapal/', './perbaikan-crane-kapal-industri/',
+                } if key == 'marine' else set()
+                detail_links = [link['href'] for link in Links(html=details).links]
+                self.assertCountEqual(detail_links, expected_links)
                 self.assertNotIn('What to send us', block)
                 self.assertNotIn('service-brand-links', block)
                 self.assertEqual(block.count('class="scope-detail"'), len(service['groups']))

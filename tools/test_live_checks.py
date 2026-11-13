@@ -8,6 +8,7 @@ from unittest.mock import patch
 from urllib.parse import urlsplit
 from check_live import BASE, check
 from check import CONTENT_ROUTES, SERVICE_PAGE_ROUTES
+from ship_service_pages import LEGACY_SHIP_REPAIR, SHIP_REPAIR
 
 class LiveCheckTests(unittest.TestCase):
     def setUp(self):
@@ -21,6 +22,11 @@ class LiveCheckTests(unittest.TestCase):
         part=urlsplit(url);path=part.path
         if part.scheme=='http' or part.hostname.startswith('www.'):
             return 301,{'Location':BASE+'/'},b''
+        if path in {f'/{LEGACY_SHIP_REPAIR}{suffix}' for suffix in ('', '/', '/index.html')}:
+            target = f'{BASE}/{SHIP_REPAIR}/'
+            if part.query:
+                target += '?' + part.query
+            return 301, {'Location': target}, b''
         redirects={'/araya/':'/','/araya/about-us/':'/#about','/araya/about/':'/#about',
             '/araya/services/':'/#services','/araya/services/marine/':'/#marine-services',
             '/araya/services/industrial/':'/#industrial-services','/araya/services/automation/':'/#automation-services',
@@ -35,6 +41,13 @@ class LiveCheckTests(unittest.TestCase):
         return (200,{},self.files[name]) if name in self.files else (404,{},b'not found')
     def test_valid_site_and_migration_pass(self):
         with patch('check_live.fetch',side_effect=self.response):check(self.path)
+    def test_old_ship_repair_redirect_preserves_campaign_query(self):
+        def drops_query(url):
+            if urlsplit(url).path == f'/{LEGACY_SHIP_REPAIR}/':
+                return 301, {'Location': f'{BASE}/{SHIP_REPAIR}/'}, b''
+            return self.response(url)
+        with patch('check_live.fetch', side_effect=drops_query), self.assertRaisesRegex(ValueError, 'redirect mismatch'):
+            check(self.path)
     def test_changed_live_bytes_fail(self):
         self.files['assets/site.js']=b'corrupted'
         with patch('check_live.fetch',side_effect=self.response),self.assertRaisesRegex(ValueError,'Live file mismatch'):check(self.path)

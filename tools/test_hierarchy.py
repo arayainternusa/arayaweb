@@ -21,7 +21,7 @@ class HierarchyTests(unittest.TestCase):
             self.assertEqual(block.count('class="scope-detail"'), len(data['groups']))
             self.assertIn(data['card_image'], block)
             self.assertIn(f'id="{key}-equipment"', block)
-            self.assertNotIn('<a ', block)
+            self.assertNotIn('<a ', block.split('<details', 1)[0])
 
     def test_brand_section_names_match_contents_and_profile_precedes_index(self):
         for brand in BRANDS:

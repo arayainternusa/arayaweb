@@ -3,7 +3,7 @@
 function demand($ok, $why) { if (!$ok) throw new RuntimeException($why); }
 function valid_release_id($id) {return preg_match('/\A[a-f0-9]{40}-[1-9][0-9]{0,19}-[1-9][0-9]{0,9}\z/',$id)===1;}
 function service_page_directories() {
-    return ['instalasi-fire-alarm','perbaikan-kapal-surabaya-gresik','perbaikan-kelistrikan-kapal','perbaikan-mesin-kapal',
+    return ['instalasi-fire-alarm','perbaikan-kapal','perbaikan-kelistrikan-kapal','perbaikan-mesin-kapal',
         'retrofit-kontrol-monitoring-kapal','perbaikan-kemudi-manuver-kapal','perbaikan-crane-kapal-industri'];
 }
 function service_page_files() {return array_map(function($route){return $route.'/index.html';}, service_page_directories());}

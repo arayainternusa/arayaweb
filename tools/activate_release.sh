@@ -78,7 +78,7 @@ test ! -L "$public"
 if [[ ! -d "$public" ]]; then mkdir -m 755 "$public"; fi
 test "$(cd "$public" && pwd -P)" = "$public"
 for name in index.html assets noris comap marine industrial automation privacy robots.txt sitemap.xml instalasi-fire-alarm \
-  perbaikan-kapal-surabaya-gresik perbaikan-kelistrikan-kapal perbaikan-mesin-kapal \
+  perbaikan-kapal perbaikan-kelistrikan-kapal perbaikan-mesin-kapal \
   retrofit-kontrol-monitoring-kapal perbaikan-kemudi-manuver-kapal perbaikan-crane-kapal-industri; do
   alias="$root/$name"; expected="../araya-static/.araya-current/$name"
   if [[ -L "$alias" ]]; then test "$(readlink "$alias")" = "$expected"; else test ! -e "$alias"; ln -s "$expected" "$alias"; fi

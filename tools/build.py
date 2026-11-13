@@ -11,7 +11,7 @@ from brand_profiles import BRANDS
 from brand_pages import brand_content
 from brand_indonesian import GUIDES, indonesian_content, indonesian_title
 import fire_alarm
-from ship_service_pages import PAGES as SHIP_SERVICE_PAGES, SHIP_REPAIR, service_content
+from ship_service_pages import LEGACY_SHIP_REPAIR, PAGES as SHIP_SERVICE_PAGES, SHIP_REPAIR, service_content
 from site_content import SERVICES, CLIENTS, BRAND_GROUPS, LEADERSHIP
 from landing_services import service_details, legacy_targets
 from ui_components import srcset
@@ -85,6 +85,8 @@ def shell(title, description, content, route="", schema=(), *, language='en', co
     brand_footer_links = ''.join(f'<a href="{prefix}{key}/{brand_suffix}">{escape(data["name"])}</a>' for key, data in BRANDS.items())
     service_names = {'marine': 'Layanan kapal', 'industrial': 'Layanan industri', 'automation': 'Otomasi'}
     service_footer_links = ''.join(f'<a href="{home}#{key}-services">{escape(ui(data["name"], service_names[key]))}</a>' for key, data in SERVICES.items())
+    if not route:
+        service_footer_links += f'<a lang="id" href="./{SHIP_REPAIR}/">Perbaikan kapal</a>'
     route_key = route.split('/')[0]
     hero_brand = BRANDS.get(route_key)
     contact_topic = contact_topic or (hero_brand or SERVICES.get(route_key) or {}).get("name", "a project")
@@ -192,10 +194,6 @@ def home():
 <section class="section section-muted" id="services"><div class="container">
   <div class="section-heading"><div><p class="eyebrow">WHAT WE DO</p><h2>Our services</h2></div><p>Supply, repair, upgrade and retrofit for marine and industrial systems.</p></div>
   <div class="landing-services">{service_sections}</div>
-  <div class="service-page-link" lang="id">
-    <a class="text-link" href="./{SHIP_REPAIR}/">{escape(SHIP_SERVICE_PAGES[SHIP_REPAIR].heading)} {ARROW}</a>
-    <a class="text-link" href="./{fire_alarm.ROUTE}">{escape(fire_alarm.HEADING)} {ARROW}</a>
-  </div>
 </div></section>
 <section class="section projects" id="clients"><div class="container">
   <div class="section-heading"><div><p class="eyebrow">OUR CLIENTS</p><h2>Clients who<br>trust Araya.</h2></div><p>Organisations that trust PT Araya Internusa with their engineering and automation work.</p></div>
@@ -247,6 +245,7 @@ def main():
                 or any(p.is_symlink() for p in PUBLIC.rglob('*'))):
             raise ValueError('Build paths must not contain symlinks')
         PUBLIC.mkdir(parents=True, exist_ok=True)
+        (PUBLIC / LEGACY_SHIP_REPAIR / 'index.html').unlink(missing_ok=True)
         shutil.copytree(source, PUBLIC / 'assets', dirs_exist_ok=True)
     routes = [""]
     website = {"@type": "WebSite", "@id": BASE + "#website", "name": "PT Araya Internusa", "url": BASE, "publisher": {"@id": BASE + "#organization"}}
@@ -279,6 +278,15 @@ def main():
                            service_metadata(route, page.heading, page.description, ship_service_areas),
                            language='id', contact_topic=page.contact_topic, contact_hint=page.contact_hint))
         routes.append(route)
+    if args.target == 'preview':
+        target = f'../{SHIP_REPAIR}/'
+        write(LEGACY_SHIP_REPAIR, f'''<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="refresh" content="0;url={target}">
+<link rel="canonical" href="{BASE}{SHIP_REPAIR}/">
+<title>Jasa Perbaikan Kapal | Araya</title></head>
+<body><main><h1>Jasa Perbaikan Kapal</h1><p><a href="{target}">Buka halaman perbaikan kapal</a></p></main></body></html>''')
     write('privacy', shell('Privacy notice | PT Araya Internusa', 'How PT Araya Internusa handles website analytics, your privacy choices and contact enquiries.', privacy_content(), 'privacy/', [breadcrumb('privacy/', 'Privacy notice')]))
     routes.append('privacy/')
     urls = ''.join(f'<url><loc>{BASE}{route}</loc><lastmod>{datetime.now(timezone(timedelta(hours=7))).date().isoformat()}</lastmod></url>' for route in routes)
@@ -286,7 +294,7 @@ def main():
     # Crawlers must be able to read the preview's noindex meta tags.
     robots = f'User-agent: *\nAllow: /\nSitemap: {BASE}sitemap.xml\n' if args.target == 'production' else 'User-agent: *\nAllow: /\n'
     (PUBLIC / 'robots.txt').write_text(robots, encoding='utf-8')
-    print(f"Built {args.target}: {len(routes)} content pages, 3 legacy service redirects, sitemap.xml and robots.txt.")
+    print(f"Built {args.target}: {len(routes)} content pages, compatibility redirects, sitemap.xml and robots.txt.")
 
 
 if __name__ == "__main__":

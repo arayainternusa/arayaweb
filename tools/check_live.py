@@ -8,6 +8,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 from check import CONTENT_ROUTES, SERVICE_PAGE_ROUTES
+from ship_service_pages import LEGACY_SHIP_REPAIR, SHIP_REPAIR
 
 BASE = 'https://arayainternusa.co.id'
 class NoRedirect(HTTPRedirectHandler):
@@ -46,10 +47,14 @@ def check(manifest_path):
         '/araya/team/':'/#leadership','/araya/contact/':'/#contact','/araya/contact-2/':'/#contact',
         '/index.php':'/','/noris':'/noris/','/comap':'/comap/','/privacy':'/privacy/',
         '/noris/id':'/noris/id/','/comap/id':'/comap/id/',
+        **{f'/{LEGACY_SHIP_REPAIR}{suffix}': f'/{SHIP_REPAIR}/'
+           for suffix in ('', '/', '/index.html', '/?utm_source=araya_verify')},
         **{f'/{route.rstrip("/")}': f'/{route}' for route in SERVICE_PAGE_ROUTES}}
     for source, target in redirects.items():
         code, headers, _ = fetch(BASE+source)
         location = headers.get('Location', '')
+        if '?' in source:
+            target += '?' + source.split('?', 1)[1]
         if code != 301 or location not in {target, BASE+target}:
             raise ValueError(f'Legacy/canonical redirect mismatch: {source} ({code}, {location})')
     for route, statuses in [('/araya/wp-admin/', {410}),('/araya/wp-content/uploads/company-profile.pdf',{410}),

@@ -16,7 +16,7 @@ try {
     $sha = str_repeat('a',40);
     $files = ['index.html'=>'home','noris/index.html'=>'noris','comap/index.html'=>'comap',
         'noris/id/index.html'=>'noris id','comap/id/index.html'=>'comap id','privacy/index.html'=>'privacy','instalasi-fire-alarm/index.html'=>'fire alarm',
-        'perbaikan-kapal-surabaya-gresik/index.html'=>'ship repair',
+        'perbaikan-kapal/index.html'=>'ship repair',
         'perbaikan-kelistrikan-kapal/index.html'=>'ship electrical',
         'perbaikan-mesin-kapal/index.html'=>'ship engine repair',
         'retrofit-kontrol-monitoring-kapal/index.html'=>'control retrofit',

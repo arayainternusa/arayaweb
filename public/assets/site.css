@@ -382,7 +382,9 @@ details[open]>summary .disclosure-chevron{transform:rotate(180deg)}
 .brand-language a:hover,.brand-language [aria-current]{color:#ff862e}
 
 .hero-product-cover img{object-fit:cover;padding:0}
-.service-page-link{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:24px}
+.scope-page-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:10px}
+.scope-page-links a{color:var(--orange-readable);font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.scope-page-links a:hover{color:var(--ink)}
 
 .service-guide-hero h1{max-width:17ch;text-wrap:balance}
 .service-guide-hero .hero-product img{height:auto;aspect-ratio:4/3;object-position:center}
