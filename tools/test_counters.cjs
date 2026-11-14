@@ -30,18 +30,26 @@ function fixture(reduced = false) {
 
 let f = fixture();
 assert.equal(f.project.textContent, '1,500+', 'Final number is usable before observation');
-f.enter(f.project); f.tick(0); f.tick(400);
-const intermediate=Number(f.project.textContent.replace(/[^0-9]/g,''));
-assert(intermediate > 0 && intermediate < 1500, 'Counter progresses');
-f.tick(900);
+f.enter(f.project); f.tick(0);
+const samples = [300, 600, 900, 1200, 1500, 1800].map(time => {
+  f.tick(time);
+  return Number(f.project.textContent.replace(/[^0-9]/g, ''));
+});
+assert(samples[0] > 0 && samples.at(-1) < 1500, 'Large counter is still moving at 1.8 seconds');
+const gains = samples.map((value, i) => value - (samples[i - 1] || 0));
+assert(Math.abs(gains[0] - gains[1]) <= 1, 'Large counter starts at a steady rate');
+for (let i = 2; i < gains.length; i++) {
+  assert(gains[i] > 0 && gains[i] < gains[i - 1], 'Large counter progressively slows');
+}
+f.tick(2000);
 assert.equal(f.project.textContent,'1,500+');
 assert.equal(f.frames.size,0,'No perpetual counter loop');
 f.enter(f.project);
 assert.equal(f.frames.size,0,'A second observation does not restart a finished counter');
-f.enter(f.age); f.tick(1000); f.tick(1100);
+f.enter(f.age); f.tick(2100); f.tick(2200);
 f.age.textContent='18';
 f.events['company-date-updated']({detail:{age:18}});
-f.tick(2000);
+f.tick(3100);
 assert.equal(f.age.textContent,'18','New Year update cannot be overwritten by an old animation');
 
 f = fixture(true);

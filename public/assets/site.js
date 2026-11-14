@@ -206,6 +206,43 @@ if ('IntersectionObserver' in window && typeof Element.prototype.animate === 'fu
   });
 }
 
+document.querySelectorAll('[data-service-photo-slider]').forEach(slider => {
+  const track = slider.querySelector('.service-photo-track');
+  const controls = slider.querySelector('.service-photo-controls');
+  const status = controls.querySelector('span');
+  const count = track.children.length;
+  let current = 0;
+  let next = null;
+
+  const move = step => {
+    const from = next ?? current;
+    next = (from + step + count) % count;
+    const wrapped = Math.abs(next - from) > 1;
+    track.scrollTo({
+      left: next * track.clientWidth,
+      behavior: motionPreference.matches || wrapped ? 'instant' : 'smooth',
+    });
+  };
+
+  track.addEventListener('scroll', () => {
+    const index = Math.round(track.scrollLeft / track.clientWidth);
+    if (index === current || index < 0 || index >= count) return;
+    current = index;
+    status.textContent = `${current + 1} / ${count}`;
+  }, {passive:true});
+  track.addEventListener('scrollend', () => { next = null; });
+  track.addEventListener('pointerdown', () => { next = null; });
+  track.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    move(event.key === 'ArrowLeft' ? -1 : 1);
+  });
+  controls.querySelectorAll('[data-photo-step]').forEach(button => {
+    button.addEventListener('click', () => move(Number(button.dataset.photoStep)));
+  });
+  controls.hidden = false;
+});
+
 // Metric counters: text only, once per metric, with no extra network request.
 (() => {
   const metrics = [...document.querySelectorAll('[data-count]')];
@@ -230,14 +267,29 @@ if ('IntersectionObserver' in window && typeof Element.prototype.animate === 'fu
       if (preference.matches) return;
       const target = Number(element.dataset.count || element.textContent.replace(/[^0-9]/g, ''));
       if (!Number.isFinite(target) || target < 0) return;
+      const largeCounter = target >= 1000;
+      const duration = largeCounter ? 2000 : 800;
       const state = {target, suffix:element.dataset.countSuffix || '', start:null, frame:0};
       const step = now => {
         if (!active.has(element)) return;
         if (state.start === null) state.start = now;
-        const progress = Math.min(1, (now - state.start) / 800);
-        element.textContent = format.format(Math.round(target * (1 - (1 - progress) ** 3))) + state.suffix;
-        if (progress < 1) state.frame = requestAnimationFrame(step);
-        else finish(element, state);
+        const progress = (now - state.start) / duration;
+        if (progress >= 1) {
+          finish(element, state);
+          return;
+        }
+        if (largeCounter) {
+          // Hold a steady pace for the first 30%, then ease to a stop.
+          const steadyUntil = 0.3;
+          const slowdownDuration = 1 - steadyUntil;
+          const slowdownElapsed = Math.max(0, progress - steadyUntil);
+          const distance = progress - slowdownElapsed ** 2 / (2 * slowdownDuration);
+          const totalDistance = steadyUntil + slowdownDuration / 2;
+          element.textContent = format.format(Math.floor(target * distance / totalDistance)) + state.suffix;
+        } else {
+          element.textContent = format.format(Math.round(target * (1 - (1 - progress) ** 3))) + state.suffix;
+        }
+        state.frame = requestAnimationFrame(step);
       };
       active.set(element, state);
       state.frame = requestAnimationFrame(step);

@@ -3,10 +3,10 @@
 from html import escape
 
 ROUTE = 'instalasi-fire-alarm/'
-TITLE = 'Jasa Instalasi & Perbaikan Fire Alarm Surabaya dan Gresik | Araya'
+TITLE = 'Jasa Instalasi & Perbaikan Fire Alarm Kapal dan Industri | Araya'
 DESCRIPTION = (
     'Jasa instalasi, perbaikan, dan retrofit fire alarm kapal, pabrik, dan gudang '
-    'di Surabaya dan Gresik. PT Araya Internusa menangani sistem berbagai merek.'
+    'di Surabaya, Gresik, dan Jakarta. PT Araya Internusa menangani sistem berbagai merek.'
 )
 HEADING = 'Instalasi dan Perbaikan Fire Alarm Kapal & Industri'
 CONTACT_HINT = (
@@ -17,15 +17,10 @@ CONTACT_HINT = (
 
 def fire_alarm_content():
     return f'''
-<section class="brand-hero brand-landing fire-hero">
-  <div class="container brand-landing-grid">
-    <div>
-      <h1>{escape(HEADING)}</h1>
-      <p class="brand-intro">PT Araya Internusa melayani instalasi, perbaikan, dan retrofit fire alarm serta sistem pemadaman tetap untuk kapal, pabrik, dan gudang di Surabaya dan Gresik.</p>
-    </div>
-    <div class="hero-product hero-product-cover">
-      <img src="../assets/images/work-fire-alarm-800.webp" alt="Teknisi Araya mengerjakan kabel sistem fire alarm di kapal" width="800" height="599" fetchpriority="high">
-    </div>
+<section class="brand-hero brand-landing service-guide-hero">
+  <div class="container service-guide-hero-copy">
+    <h1>{escape(HEADING)}</h1>
+    <p class="brand-intro">PT Araya Internusa memasang, memperbaiki, dan melakukan retrofit sistem fire alarm serta sistem pemadaman tetap untuk kapal, pabrik, dan gudang. Area layanan mencakup Surabaya, Gresik, dan Jakarta.</p>
   </div>
 </section>
 <section class="section" aria-labelledby="fire-alarm-scope">

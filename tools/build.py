@@ -11,7 +11,10 @@ from brand_profiles import BRANDS
 from brand_pages import brand_content
 from brand_indonesian import GUIDES, indonesian_content, indonesian_title
 import fire_alarm
-from ship_service_pages import LEGACY_SHIP_REPAIR, PAGES as SHIP_SERVICE_PAGES, SHIP_REPAIR, service_content
+from ship_service_pages import (
+    LEGACY_SHIP_REPAIR, PAGES as SHIP_SERVICE_PAGES, SHIP_REPAIR,
+    all_services, service_content,
+)
 from site_content import SERVICES, CLIENTS, BRAND_GROUPS, LEADERSHIP
 from landing_services import service_details, legacy_targets
 from ui_components import srcset
@@ -265,16 +268,19 @@ def main():
                            indonesian_content(key, '../../'), route, [breadcrumb(route, title, 'id')], language='id'))
         routes.append(route)
     local_service_areas = [{'@type': 'City', 'name': 'Surabaya'},
-                           {'@type': 'AdministrativeArea', 'name': 'Gresik'}]
+                           {'@type': 'AdministrativeArea', 'name': 'Gresik'},
+                           {'@type': 'City', 'name': 'Jakarta'}]
     route = fire_alarm.ROUTE
-    write(route, shell(fire_alarm.TITLE, fire_alarm.DESCRIPTION, fire_alarm.fire_alarm_content(), route,
+    fire_content = fire_alarm.fire_alarm_content() + all_services(route.rstrip('/'), ARROW)
+    write(route, shell(fire_alarm.TITLE, fire_alarm.DESCRIPTION, fire_content, route,
                        service_metadata(route, fire_alarm.HEADING, fire_alarm.DESCRIPTION, local_service_areas),
                        language='id', contact_topic='sistem fire alarm', contact_hint=fire_alarm.CONTACT_HINT))
     routes.append(route)
     ship_service_areas = [*local_service_areas, {'@type': 'Country', 'name': 'Indonesia'}]
     for slug, page in SHIP_SERVICE_PAGES.items():
         route = f'{slug}/'
-        write(route, shell(f'{page.title} | Araya', page.description, service_content(page, ARROW), route,
+        content = service_content(page) + all_services(slug, ARROW)
+        write(route, shell(f'{page.title} | Araya', page.description, content, route,
                            service_metadata(route, page.heading, page.description, ship_service_areas),
                            language='id', contact_topic=page.contact_topic, contact_hint=page.contact_hint))
         routes.append(route)
