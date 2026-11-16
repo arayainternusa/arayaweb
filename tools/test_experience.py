@@ -1,5 +1,6 @@
 """Regression checks for enquiry context and navigation in the generated site."""
 import unittest
+from hashlib import sha256
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit, parse_qs
@@ -27,6 +28,20 @@ class Links(HTMLParser):
 
 
 class ExperienceTests(unittest.TestCase):
+    def test_service_hero_photos_are_unique(self):
+        from fire_alarm import PHOTOS as FIRE_ALARM_PHOTOS, ROUTE as FIRE_ALARM_ROUTE
+        from ship_service_pages import PAGES
+
+        groups = [(slug, page.photos) for slug, page in PAGES.items()]
+        groups.append((FIRE_ALARM_ROUTE, FIRE_ALARM_PHOTOS))
+        used = {}
+        for slug, photos in groups:
+            for filename, _ in photos:
+                path = PUBLIC / 'assets' / 'images' / filename
+                digest = sha256(path.read_bytes()).digest()
+                self.assertIsNone(used.get(digest), f'{slug}: {filename} repeats {used.get(digest)}')
+                used[digest] = f'{slug}/{filename}'
+
     def test_contact_keeps_current_page(self):
         for path in PUBLIC.rglob('index.html'):
             if path.parent.name in {'marine', 'industrial', 'automation', 'perbaikan-kapal-surabaya-gresik'}:

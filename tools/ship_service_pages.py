@@ -25,15 +25,7 @@ SERVICE_LINKS = (
     (FIRE_ALARM, 'Fire Alarm Kapal & Industri'),
 )
 
-ENGINE_ROOM = ('work-engine-room-1280.webp', 'Tim Araya bekerja di ruang mesin kapal')
 ENGINE_INSPECTION = ('marine-date-free.webp', 'Teknisi Araya memeriksa peralatan mesin kapal')
-ELECTRICAL_PANEL = ('work-ship-electrical-960.webp', 'Teknisi mengerjakan pengawatan panel KM Awu')
-SWITCHBOARD = ('work-switchboard-date-free-800.webp', 'Tim Araya memeriksa switchboard kapal')
-UMSINI_PANEL = ('work-umsini-panel.webp', 'Teknisi memeriksa panel listrik KM Umsini')
-MONITORING_CONSOLE = ('work-ship-monitoring-960.webp', 'Tim bekerja pada konsol monitoring KM Binaiya')
-CIREMAI_DIAGNOSTICS = ('work-control-room-diagnostics-900.webp', 'Teknisi melakukan diagnostik di ruang kontrol KM Ciremai')
-LEUSER_CONTROL = ('work-ship-manoeuvring-960.webp', 'Teknisi memeriksa rangkaian kontrol manuver KM Leuser')
-AWU_CONTROL = ('work-awu-manoeuvring.webp', 'Teknisi memperbaiki sistem kontrol manuver KM Awu')
 
 
 @dataclass(frozen=True)
@@ -63,10 +55,16 @@ PAGES = {
         contact_topic='perbaikan kapal',
         contact_hint='Kirim nama dan lokasi kapal, peralatan yang perlu ditangani, serta gangguan atau pekerjaan yang dibutuhkan.',
         photos=(
-            ENGINE_ROOM,
+            ('work-engine-team-blue.webp', 'Tim Araya mengerjakan mesin kapal di ruang mesin'),
             ('work-ship-water-treatment.webp', 'Tim mengerjakan sistem pengolahan air di kapal'),
-            ELECTRICAL_PANEL, SWITCHBOARD, ENGINE_INSPECTION, MONITORING_CONSOLE,
-            CIREMAI_DIAGNOSTICS, LEUSER_CONTROL, AWU_CONTROL, UMSINI_PANEL,
+            ('work-binaiya-autopilot-wiring.webp', 'Teknisi mengerjakan pengawatan autopilot KM Binaiya'),
+            ('work-engine-team-yanmar.webp', 'Tim Araya mengerjakan mesin Yanmar di kapal'),
+            ('work-bima315-compressor-cabling.webp', 'Teknisi mengerjakan kabel panel kompresor KT Bima 315'),
+            ('work-marine-drive-electronics.webp', 'Teknisi mengerjakan rangkaian elektronik penggerak kapal'),
+            ('work-awu-distribution-panel-wiring.webp', 'Teknisi mengerjakan pengawatan panel listrik KM Awu'),
+            ('work-leuser-bridge-console.webp', 'Teknisi mengerjakan konsol anjungan KM Leuser'),
+            ('work-awu-local-control.webp', 'Teknisi menangani kontrol manuver di ruang mesin KM Awu'),
+            ('work-ship-manoeuvring-960.webp', 'Teknisi memeriksa rangkaian kontrol manuver KM Leuser'),
         ),
     ),
     ELECTRICAL: ServicePage(
@@ -83,7 +81,9 @@ PAGES = {
         contact_topic='kelistrikan kapal',
         contact_hint='Kirim lokasi kapal, jenis panel, serta kebutuhan instalasi atau gejala gangguan. Sertakan foto panel atau diagram satu garis jika tersedia.',
         photos=(
-            ELECTRICAL_PANEL, SWITCHBOARD, UMSINI_PANEL,
+            ('work-ship-electrical-960.webp', 'Teknisi mengerjakan pengawatan panel KM Awu'),
+            ('work-switchboard-date-free-800.webp', 'Tim Araya memeriksa switchboard kapal'),
+            ('work-umsini-panel.webp', 'Teknisi memeriksa panel listrik KM Umsini'),
             ('work-tidar-control-panel.webp', 'Teknisi mengerjakan pengawatan panel kontrol KM Tidar'),
             ('work-ship-blower-panel.webp', 'Teknisi memeriksa panel kontrol blower kapal'),
             ('work-labobar-watertight-door.webp', 'Teknisi mengerjakan kontrol pintu kedap air KM Labobar'),
@@ -104,7 +104,8 @@ PAGES = {
         contact_topic='perbaikan mesin kapal (ME & AE)',
         contact_hint='Kirim lokasi kapal, jenis dan model mesin, serta gejala gangguan. Sertakan foto pelat nama atau kode alarm jika tersedia.',
         photos=(
-            ENGINE_INSPECTION, ENGINE_ROOM,
+            ENGINE_INSPECTION,
+            ('work-engine-room-1280.webp', 'Tim Araya bekerja di ruang mesin kapal'),
             ('work-awu-generator-panel.webp', 'Teknisi memeriksa panel generator darurat KM Awu'),
             ('work-sangiang-engine-speed.webp', 'Teknisi menguji kontrol putaran mesin KM Sangiang'),
             ('work-tidar-engine-thermocouple.webp', 'Teknisi mengerjakan termokopel mesin KM Tidar'),
@@ -125,9 +126,9 @@ PAGES = {
         contact_topic='otomasi dan monitoring kapal',
         contact_hint='Kirim lokasi kapal, jenis sistem, dan gejala gangguan atau fungsi yang ingin diperbarui. Sertakan model panel, diagram, atau daftar I/O jika tersedia.',
         photos=(
-            MONITORING_CONSOLE,
+            ('work-ship-monitoring-960.webp', 'Tim bekerja pada konsol monitoring KM Binaiya'),
             ('work-binaiya-monitoring-cabinet.webp', 'Teknisi bekerja pada kabinet monitoring KM Binaiya'),
-            CIREMAI_DIAGNOSTICS,
+            ('work-control-room-diagnostics-900.webp', 'Teknisi melakukan diagnostik di ruang kontrol KM Ciremai'),
             ('work-lognus5-plc.webp', 'Teknisi bekerja pada kabinet PLC Lognus 5'),
             ('work-tidar-alarm-cabinet.webp', 'Teknisi mengerjakan pengawatan kabinet alarm KM Tidar'),
             ('work-tidar-general-alarm.webp', 'Teknisi bekerja pada panel general alarm KM Tidar'),
@@ -150,7 +151,7 @@ PAGES = {
         photos=(
             ('work-binaiya-bridge.webp', 'Teknisi bekerja pada konsol anjungan KM Binaiya'),
             ('work-leuser-manoeuvring-tubing.webp', 'Teknisi mengerjakan pipa kontrol manuver KM Leuser'),
-            AWU_CONTROL,
+            ('work-awu-manoeuvring.webp', 'Teknisi memperbaiki sistem kontrol manuver KM Awu'),
             ('work-awu-manoeuvring-manifold.webp', 'Teknisi memeriksa rangkaian kontrol manuver KM Awu'),
             ('work-umsini-manoeuvring-panel.webp', 'Teknisi mengerjakan panel manuver KM Umsini'),
             ('work-umsini-manoeuvring-tubing.webp', 'Tim Araya mengerjakan pipa kontrol manuver KM Umsini'),

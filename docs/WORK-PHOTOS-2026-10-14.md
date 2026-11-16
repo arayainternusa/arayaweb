@@ -12,6 +12,24 @@ The owner supplied two work photographs, asked for larger service pictures, and 
 - Added “Engineering in action” after the service features, using two cards with orange edge accents and overlapping white captions from the owner's reference. No additional enquiry or navigation links.
 - Brand pages retain their existing information structure; only the shared CSS cache version changes there.
 
+## Layanan hero photo workflow
+
+1. Review the Araya originals in `D:/ARAYA` and the clean copies in `arayaweb/picture/work-photos-clean`. Use sharp photos that show technicians doing work. Confirm the vessel and job from the album or project report before naming either in the alt text. Keep originals in the archive.
+2. Give each shot one home across the dedicated layanan heroes. Keep specialist work on its relevant page and use distinct shots for the general Perbaikan Kapal carousel. Visually compare the shortlist because a second crop or export of the same source can have a different file hash.
+3. Fit each accepted photo to a landscape 4:3 frame, crop out visible camera dates, and export WebP into `public/assets/images/`. The current replacements use up to 1120 × 840 pixels and preserve the source resolution for smaller images. Use a descriptive filename and include only accepted web exports in the site assets.
+4. Edit the `photos` tuple for the correct service in [`tools/ship_service_pages.py`](../tools/ship_service_pages.py). Fire Alarm's list is `PHOTOS` in [`tools/fire_alarm.py`](../tools/fire_alarm.py). Each entry is a WebP filename and factual Indonesian alt text. Tuple order controls the carousel order and the first entry is the lead photo. Crane uses an empty tuple for its text-only hero.
+5. From the repo root, run `python tools/build.py`, `python tools/check.py`, `python tools/test_experience.py`, and `python tools/test_loading.py`. The experience test rejects files with matching SHA-256 hashes anywhere in the dedicated service hero lists. Review the generated pages in a browser on desktop and mobile. Check the full slide order, previous and next buttons, wraparound, framing and date stamps.
+6. Review the labeled photo sheet before pushing an approved update to `main`. GitHub Actions builds and verifies the production package, then promotes it to Rumahweb. Check the release result and the live slide order after deployment. [Deployment and rollback](PRODUCTION-LAUNCH-2026-10-15.md)
+
+### Approved Perbaikan Kapal replacements
+
+The general carousel has 10 photos. The specialist lineups retain their previous counts, for 40 distinct shots across the six photo heroes.
+
+| Slot | Accepted shot | Removed from the ready list |
+| --- | --- | --- |
+| A3 | KM Binaiya autopilot wiring, sourced from `work-photos-clean/km-binaiya-autopilot-wiring-2015.jpg`. Published asset `work-binaiya-autopilot-wiring.webp`. | Selat Makassar GS pump photo. |
+| A7 | KM Awu electrical-panel wiring, sourced from `PELNI foto/KM AWU/2021_09_17 awu panel/IMG_8461.JPG`. Published asset `work-awu-distribution-panel-wiring.webp`. | KM Sirimau general-alarm cabling photo. |
+
 ## Photograph provenance
 
 Originals remain in the owner's `arayaweb/picture` directory, outside the Git repository. These are owner-supplied Araya photographs, not manufacturer examples.
