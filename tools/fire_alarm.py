@@ -1,7 +1,5 @@
 """Bahasa Indonesia copy for the fire alarm installation and repair service."""
 
-from html import escape
-
 ROUTE = 'instalasi-fire-alarm/'
 TITLE = 'Jasa Instalasi & Perbaikan Fire Alarm Kapal dan Industri | Araya'
 DESCRIPTION = (
@@ -9,6 +7,16 @@ DESCRIPTION = (
     'di Surabaya, Gresik, dan Jakarta. PT Araya Internusa menangani sistem berbagai merek.'
 )
 HEADING = 'Instalasi dan Perbaikan Fire Alarm Kapal & Industri'
+INTRO = (
+    'PT Araya Internusa memasang, memperbaiki, dan melakukan retrofit sistem fire alarm serta sistem pemadaman tetap '
+    'untuk kapal, pabrik, dan gudang. Area layanan mencakup Surabaya, Gresik, dan Jakarta.'
+)
+PHOTOS = (
+    ('work-tidar-fire-alarm-detector.webp', 'Teknisi mengerjakan detektor fire alarm KM Tidar'),
+    ('work-fire-alarm-800.webp', 'Teknisi mengerjakan kabel detektor di plafon kapal'),
+    ('work-jetliner-fire-alarm-wiring.webp', 'Teknisi mengerjakan pengawatan fire alarm KM Jetliner'),
+    ('work-tatamailau-fire-alarm-call-point.webp', 'Teknisi memperbaiki manual call point fire alarm KM Tatamailau'),
+)
 CONTACT_HINT = (
     'Kirim lokasi kapal atau fasilitas, jenis sistem, serta kebutuhan instalasi atau gejala gangguan. '
     'Sertakan merek dan model panel jika tersedia.'
@@ -16,13 +24,7 @@ CONTACT_HINT = (
 
 
 def fire_alarm_content():
-    return f'''
-<section class="brand-hero brand-landing service-guide-hero">
-  <div class="container service-guide-hero-copy">
-    <h1>{escape(HEADING)}</h1>
-    <p class="brand-intro">PT Araya Internusa memasang, memperbaiki, dan melakukan retrofit sistem fire alarm serta sistem pemadaman tetap untuk kapal, pabrik, dan gudang. Area layanan mencakup Surabaya, Gresik, dan Jakarta.</p>
-  </div>
-</section>
+    return '''
 <section class="section" aria-labelledby="fire-alarm-scope">
   <div class="container">
     <div class="section-heading">

@@ -82,7 +82,13 @@ PAGES = {
         ),
         contact_topic='kelistrikan kapal',
         contact_hint='Kirim lokasi kapal, jenis panel, serta kebutuhan instalasi atau gejala gangguan. Sertakan foto panel atau diagram satu garis jika tersedia.',
-        photos=(ELECTRICAL_PANEL, SWITCHBOARD, UMSINI_PANEL),
+        photos=(
+            ELECTRICAL_PANEL, SWITCHBOARD, UMSINI_PANEL,
+            ('work-tidar-control-panel.webp', 'Teknisi mengerjakan pengawatan panel kontrol KM Tidar'),
+            ('work-ship-blower-panel.webp', 'Teknisi memeriksa panel kontrol blower kapal'),
+            ('work-labobar-watertight-door.webp', 'Teknisi mengerjakan kontrol pintu kedap air KM Labobar'),
+            ('work-egon-electrical-panel.webp', 'Tim Araya memeriksa panel kelistrikan KM Egon'),
+        ),
     ),
     ENGINES: ServicePage(
         heading='Jasa Perbaikan Mesin Kapal (ME & AE)',
@@ -100,6 +106,9 @@ PAGES = {
         photos=(
             ENGINE_INSPECTION, ENGINE_ROOM,
             ('work-awu-generator-panel.webp', 'Teknisi memeriksa panel generator darurat KM Awu'),
+            ('work-sangiang-engine-speed.webp', 'Teknisi menguji kontrol putaran mesin KM Sangiang'),
+            ('work-tidar-engine-thermocouple.webp', 'Teknisi mengerjakan termokopel mesin KM Tidar'),
+            ('work-awu-engine-safety.webp', 'Teknisi mengerjakan pengawatan panel keselamatan mesin ME dan AE KM Awu'),
         ),
     ),
     RETROFIT: ServicePage(
@@ -119,6 +128,10 @@ PAGES = {
             MONITORING_CONSOLE,
             ('work-binaiya-monitoring-cabinet.webp', 'Teknisi bekerja pada kabinet monitoring KM Binaiya'),
             CIREMAI_DIAGNOSTICS,
+            ('work-lognus5-plc.webp', 'Teknisi bekerja pada kabinet PLC Lognus 5'),
+            ('work-tidar-alarm-cabinet.webp', 'Teknisi mengerjakan pengawatan kabinet alarm KM Tidar'),
+            ('work-tidar-general-alarm.webp', 'Teknisi bekerja pada panel general alarm KM Tidar'),
+            ('work-leuser-monitoring-cabinet.webp', 'Teknisi mengerjakan pengawatan sistem monitoring KM Leuser'),
         ),
     ),
     MANOEUVRING: ServicePage(
@@ -136,8 +149,11 @@ PAGES = {
         contact_hint='Kirim lokasi kapal, jenis sistem kemudi atau manuver, dan gejala gangguan. Sertakan model kontrol dan alarm yang muncul jika tersedia.',
         photos=(
             ('work-binaiya-bridge.webp', 'Teknisi bekerja pada konsol anjungan KM Binaiya'),
-            LEUSER_CONTROL, AWU_CONTROL,
+            ('work-leuser-manoeuvring-tubing.webp', 'Teknisi mengerjakan pipa kontrol manuver KM Leuser'),
+            AWU_CONTROL,
             ('work-awu-manoeuvring-manifold.webp', 'Teknisi memeriksa rangkaian kontrol manuver KM Awu'),
+            ('work-umsini-manoeuvring-panel.webp', 'Teknisi mengerjakan panel manuver KM Umsini'),
+            ('work-umsini-manoeuvring-tubing.webp', 'Tim Araya mengerjakan pipa kontrol manuver KM Umsini'),
         ),
     ),
     CRANES: ServicePage(
@@ -153,7 +169,7 @@ PAGES = {
         ),
         contact_topic='perbaikan crane kapal atau industri',
         contact_hint='Kirim lokasi crane, tipe, kapasitas, dan gejala gangguan. Sertakan foto pelat nama, panel, atau pesan alarm jika tersedia.',
-        photos=(('work-crane-pendant.webp', 'Teknisi mengerjakan pengawatan pendant crane'),),
+        photos=(),
     ),
 }
 
@@ -193,15 +209,22 @@ def hero_photos(photos):
     </div>'''
 
 
+def service_hero(heading, intro, photos):
+    copy = f'<h1>{escape(heading)}</h1><p class="brand-intro">{escape(intro)}</p>'
+    if photos:
+        content = f'<div class="container brand-landing-grid"><div>{copy}</div>{hero_photos(photos)}</div>'
+    else:
+        content = f'<div class="container service-guide-hero-copy">{copy}</div>'
+    return f'''
+<section class="brand-hero brand-landing service-guide-hero">
+  {content}
+</section>'''
+
+
 def service_content(page):
     scopes = ''.join(f'<div><h3>{escape(title)}</h3><p>{escape(body)}</p></div>'
                      for title, body in page.scopes)
-    return f'''
-<section class="brand-hero brand-landing service-guide-hero">
-  <div class="container brand-landing-grid">
-    <div><h1>{escape(page.heading)}</h1><p class="brand-intro">{escape(page.intro)}</p></div>{hero_photos(page.photos)}
-  </div>
-</section>
+    return service_hero(page.heading, page.intro, page.photos) + f'''
 <section class="section" aria-labelledby="service-scope">
   <div class="container">
     <div class="section-heading"><h2 id="service-scope">Lingkup pekerjaan</h2></div>

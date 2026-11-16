@@ -13,7 +13,7 @@ from brand_indonesian import GUIDES, indonesian_content, indonesian_title
 import fire_alarm
 from ship_service_pages import (
     LEGACY_SHIP_REPAIR, PAGES as SHIP_SERVICE_PAGES, SHIP_REPAIR,
-    all_services, service_content,
+    all_services, service_content, service_hero,
 )
 from site_content import SERVICES, CLIENTS, BRAND_GROUPS, LEADERSHIP
 from landing_services import service_details, legacy_targets
@@ -271,7 +271,11 @@ def main():
                            {'@type': 'AdministrativeArea', 'name': 'Gresik'},
                            {'@type': 'City', 'name': 'Jakarta'}]
     route = fire_alarm.ROUTE
-    fire_content = fire_alarm.fire_alarm_content() + all_services(route.rstrip('/'), ARROW)
+    fire_content = (
+        service_hero(fire_alarm.HEADING, fire_alarm.INTRO, fire_alarm.PHOTOS)
+        + fire_alarm.fire_alarm_content()
+        + all_services(route.rstrip('/'), ARROW)
+    )
     write(route, shell(fire_alarm.TITLE, fire_alarm.DESCRIPTION, fire_content, route,
                        service_metadata(route, fire_alarm.HEADING, fire_alarm.DESCRIPTION, local_service_areas),
                        language='id', contact_topic='sistem fire alarm', contact_hint=fire_alarm.CONTACT_HINT))
