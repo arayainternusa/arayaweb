@@ -51,7 +51,7 @@ class ProductionTests(unittest.TestCase):
     def test_indonesian_brand_pages_have_reciprocal_language_links(self):
         home = (PRODUCTION / 'index.html').read_text(encoding='utf-8')
         for key, title in [
-            ('noris', 'Distributor Resmi Tunggal NORIS di Indonesia'),
+            ('noris', 'Distributor Resmi NORIS di Indonesia'),
             ('comap', 'Distributor Resmi ComAp di Indonesia'),
         ]:
             english = (PRODUCTION / key / 'index.html').read_text(encoding='utf-8')
@@ -59,6 +59,11 @@ class ProductionTests(unittest.TestCase):
             self.assertIn('<html lang="id">', indonesian)
             self.assertIn(f'<title>{title} | Araya Internusa</title>', indonesian)
             self.assertIn(f'<h1>{title}</h1>', indonesian)
+            if key == 'noris':
+                self.assertIn(
+                    '<p class="brand-intro">PT Araya Internusa adalah satu-satunya distributor resmi produk NORIS di Indonesia.',
+                    indonesian,
+                )
             self.assertIn(f'href="./{key}/id/" lang="id"', home)
             for page in (english, indonesian):
                 self.assertIn(f'hreflang="en" href="{BASE}{key}/"', page)

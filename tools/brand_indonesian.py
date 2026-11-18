@@ -4,9 +4,13 @@ from html import escape
 from brand_pages import hero_product_figure, portfolio_image
 from brand_profiles import BRANDS
 
+NORIS_APPOINTMENT = 'PT Araya Internusa adalah satu-satunya distributor resmi produk NORIS di Indonesia.'
+
 GUIDES = {
     'noris': {
-        'description': 'PT Araya Internusa adalah distributor resmi tunggal NORIS di Indonesia. Tanyakan sensor, instrumen, noriMos, noriStar, dan noriNet.',
+        'description': f'{NORIS_APPOINTMENT} Pengadaan sensor, instrumen, dan sistem otomasi kapal.',
+        'intro': (f'{NORIS_APPOINTMENT} Kami memasok sensor, instrumen, dan sistem otomasi kapal '
+                  'serta memberikan dukungan teknis dari Surabaya dan Jakarta.'),
         'hero_alt': 'Panel anjungan noriStar NORIS dengan dua layar dan dua tuas kontrol propulsi',
         'groups': (
             ('Sensor dan instrumen', (
@@ -47,7 +51,7 @@ GUIDES = {
 
 def indonesian_title(key):
     if key == 'noris':
-        return 'Distributor Resmi Tunggal NORIS di Indonesia'
+        return 'Distributor Resmi NORIS di Indonesia'
     return f'Distributor Resmi {BRANDS[key]["name"]} di Indonesia'
 
 
@@ -60,6 +64,10 @@ def indonesian_content(key, prefix):
     brand = BRANDS[key]
     guide = GUIDES[key]
     title = indonesian_title(key)
+    intro = guide.get('intro') or (
+        f"{guide['description']} Kami melayani pengadaan dan dukungan teknis dari kantor Surabaya dan Jakarta "
+        'untuk proyek di seluruh Indonesia.'
+    )
     products = {product['id']: product for product in brand['products']}
     applications = ''.join(
         f'<article class="scope-detail"><h3>{escape(heading)}</h3><p>{escape(body)}</p></article>'
@@ -93,7 +101,7 @@ def indonesian_content(key, prefix):
                'Sertakan nomor komponen, foto pelat nama (nameplate), jumlah yang dibutuhkan, serta lokasi kapal atau proyek.')
     return f'''<section class="brand-hero brand-landing"><div class="container">
       <div class="brand-landing-grid"><div><p class="eyebrow">{escape(brand['legal_name'])}</p><h1>{title}</h1>
-      <p class="brand-intro">{escape(guide['description'])} Kami melayani pengadaan dan dukungan teknis dari kantor Surabaya dan Jakarta untuk proyek di seluruh Indonesia.</p></div>
+      <p class="brand-intro">{escape(intro)}</p></div>
       {hero_product_figure(brand, prefix, alt=guide['hero_alt'])}</div>
     </div></section>
 {application_section}
